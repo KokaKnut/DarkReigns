@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class PlayerInput : MonoBehaviour {
     private PlayerController player;
@@ -18,12 +19,18 @@ public class PlayerInput : MonoBehaviour {
 
 	// Update is called once per frame
 	void FixedUpdate () {
-        float h = 0f;
-        h = (Input.GetKey(KeyCode.A) ? h - 1 : h);
-        h = (Input.GetKey(KeyCode.D) ? h + 1 : h);
+        //Get x-axis input
+        float x = 0f;
+        x = (Input.GetKey(KeyCode.A) ? x - 1 : x);
+        x = (Input.GetKey(KeyCode.D) ? x + 1 : x);
+
+        //Get y-axis input
+        float y = 0f;
+        y = (Input.GetKey(KeyCode.S) ? y - 1 : y);
+        y = (Input.GetKey(KeyCode.W) ? y + 1 : y);
 
         bool jump = Input.GetKeyDown(KeyCode.Space);
 
-        player.Move(h, 0f, jump);
+        player.Move(x, 0f, jump);
     }
 }

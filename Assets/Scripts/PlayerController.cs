@@ -17,21 +17,21 @@ public class PlayerController : MonoBehaviour {
         
     }
 
-    public void Move(float h, float v, bool jump)
+    public void Move(float x, float y, bool jump)
     {
         if (jump)
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y + 1);
 
-        rb.velocity = new Vector2(runSpeed * h, rb.velocity.y);
+        rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
 
         // If the input is moving the player right and the player is facing left...
-        if (h > 0 && !facingRight)
+        if (x > 0 && !facingRight)
         {
             // ... flip the player.
             Flip();
         }
         // Otherwise if the input is moving the player left and the player is facing right...
-        else if (h < 0 && facingRight)
+        else if (x < 0 && facingRight)
         {
             // ... flip the player.
             Flip();
