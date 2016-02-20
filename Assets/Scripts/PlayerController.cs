@@ -4,7 +4,8 @@ using System.Collections;
 public class PlayerController : MonoBehaviour {
 
     private Rigidbody2D rb;
-    public float runSpeed;
+    public float runSpeed = 1f;
+    public float jumpHeight = 2f;
     private bool facingRight = true;
 
 	// Use this for initialization
@@ -20,7 +21,7 @@ public class PlayerController : MonoBehaviour {
     public void Move(float x, float y, bool jump)
     {
         if (jump)
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y + 1);
+            rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
 
         rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
 
@@ -43,9 +44,11 @@ public class PlayerController : MonoBehaviour {
         // Switch the way the player is labelled as facing.
         facingRight = !facingRight;
 
-        // Multiply the player's x local scale by -1.
+        GetComponent<SpriteRenderer>().flipX = !GetComponent<SpriteRenderer>().flipX;
+
+        /*// Multiply the player's x local scale by -1.
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
-        transform.localScale = theScale;
+        transform.localScale = theScale; */
     }
 }
