@@ -4,8 +4,10 @@ using System.Collections;
 public class PlayerController : MonoBehaviour {
 
     private Rigidbody2D rb;
-    public float runSpeed;
+    public float runSpeed = 1f;
+    public float jumpHeight = 2f;
     private bool facingRight = true;
+    public bool grounded = false;
 
 	// Use this for initialization
 	void Start () {
@@ -17,21 +19,21 @@ public class PlayerController : MonoBehaviour {
         
     }
 
-    public void Move(float h, float v, bool jump)
+    public void Move(float x, float y, bool jump)
     {
-        if (jump)
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y + 1);
+        if (jump && grounded)
+            rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
 
-        rb.velocity = new Vector2(runSpeed * h, rb.velocity.y);
+        rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
 
         // If the input is moving the player right and the player is facing left...
-        if (h > 0 && !facingRight)
+        if (x > 0 && !facingRight)
         {
             // ... flip the player.
             Flip();
         }
         // Otherwise if the input is moving the player left and the player is facing right...
-        else if (h < 0 && facingRight)
+        else if (x < 0 && facingRight)
         {
             // ... flip the player.
             Flip();
@@ -43,9 +45,11 @@ public class PlayerController : MonoBehaviour {
         // Switch the way the player is labelled as facing.
         facingRight = !facingRight;
 
-        // Multiply the player's x local scale by -1.
+        GetComponent<SpriteRenderer>().flipX = !GetComponent<SpriteRenderer>().flipX;
+
+        /*// Multiply the player's x local scale by -1.
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
-        transform.localScale = theScale;
+        transform.localScale = theScale; */
     }
 }
