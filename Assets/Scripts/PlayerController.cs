@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour {
     public float runSpeed = 1f;
     public float jumpHeight = 2f;
     private bool facingRight = true;
+    public bool grounded = false;
 
 	// Use this for initialization
 	void Start () {
@@ -20,7 +21,7 @@ public class PlayerController : MonoBehaviour {
 
     public void Move(float x, float y, bool jump)
     {
-        if (jump)
+        if (jump && grounded)
             rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
 
         rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
