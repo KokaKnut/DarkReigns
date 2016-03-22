@@ -6,5 +6,22 @@
         air
     }
 
-    public TYPE type;
+    TYPE _type;
+
+    public TYPE type
+    {
+        get
+        {
+            return _type;
+        }
+        set
+        {
+            _type = value;
+        }
+    }
+
+    public Tile(TYPE type)
+    {
+        this.type = type;
+    }
 }

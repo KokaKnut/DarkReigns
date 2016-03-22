@@ -2,19 +2,14 @@
 using System.Collections;
 
 public class TileGraphics : MonoBehaviour {
-
-    [Header("Size of Tile Map")]
-    public int sizeX = 0;
-    public int sizeY = 0;
+    
     public float tileSize = 1f;
     [Space(10)]
     public Texture2D TileTexture;
     public int tileResolution;
 
-	// Use this for initialization
-	void Start () {
-        BuildMesh();
-	}
+    int sizeX = 0;
+    int sizeY = 0;
 
     Color[][] ChopUpTiles()
     {
@@ -34,7 +29,7 @@ public class TileGraphics : MonoBehaviour {
         return tiles;
     }
 
-    void BuildTexture()
+    public void BuildTexture(TileMap tileMap)
     {
         int texWidth = sizeX * tileResolution;
         int texHeight = sizeY * tileResolution;
@@ -46,7 +41,7 @@ public class TileGraphics : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                Color[] p = tiles[Random.Range(0, tiles.Length)];
+                Color[] p = tiles[(int)tileMap.GetTile(x,y).type];
                 texture.SetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution, p);
             }
         }
@@ -58,10 +53,12 @@ public class TileGraphics : MonoBehaviour {
         MeshRenderer mesh_renderer = GetComponent<MeshRenderer>();
         mesh_renderer.sharedMaterials[0].mainTexture = texture;
     }
-
-    [ContextMenu ("Rebuild Mesh")]
-    void BuildMesh()
+    
+    public void BuildMesh(TileMap tileMap)
     {
+        sizeX = tileMap.sizeX;
+        sizeY = tileMap.sizeY;
+
         int numTiles = sizeX * sizeY;
         int numTris = numTiles * 2;
 
@@ -90,6 +87,7 @@ public class TileGraphics : MonoBehaviour {
         
         //Prepare for polygon collider setting
         PolygonCollider2D poly_collider = GetComponent<PolygonCollider2D>();
+        tileMap.Percolate(0, 0);
         
         //Calculate all tris
         for (y = 0; y < sizeY; y++)
@@ -129,7 +127,7 @@ public class TileGraphics : MonoBehaviour {
         MeshFilter mesh_filter = GetComponent<MeshFilter>();
         mesh_filter.mesh = mesh;
 
-        BuildTexture();
+        BuildTexture(tileMap);
     }
 
 }
