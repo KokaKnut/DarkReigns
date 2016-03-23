@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
-public class Tile : IComparable<Tile> {
+public class Tile : IComparable {
 
 	public enum TYPE
     {
@@ -56,10 +57,18 @@ public class Tile : IComparable<Tile> {
         this.type = type;
     }
 
-    public int CompareTo(Tile other)
+    public int CompareTo(Object other)
     {
-        if (this.x == other.x)
-            return this.y.CompareTo(other.y);
-        return this.x.CompareTo(other.y);
+        if (other.GetType() != this.GetType())
+            return 1;
+        Tile otherTile = other as Tile;
+        if (this.x == otherTile.x)
+            return this.y.CompareTo(otherTile.y);
+        return this.x.CompareTo(otherTile.x);
+    }
+
+    public override string ToString()
+    {
+        return type + " at: " + x + ", " + y;
     }
 }

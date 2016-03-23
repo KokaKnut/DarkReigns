@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(TileGraphics))]
+[RequireComponent(typeof(TileCollision))]
 public class TileMapGenerator : MonoBehaviour {
 
     [Header("Size of Tile Map")]
     public int sizeX;
     public int sizeY;
+    public float tileSize = 1f;
 
     TileMap tileMap;
 
@@ -15,17 +19,23 @@ public class TileMapGenerator : MonoBehaviour {
 	}
 
     [ContextMenu("Rebuild Tilemap")]
-    void BuildTileMap()
+    public void BuildTileMap()
     {
         tileMap = new TileMap(sizeX, sizeY);
+
+        // temporary random tiles algorithm
         for (int y = 0; y < sizeY; y++)
         {
             for (int x = 0; x < sizeX; x++)
             {
-                tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)((int)Random.Range(0.0f, 1.1f))));
+                tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)((int)UnityEngine.Random.Range(0.0f, 1.1f))));
             }
         }
+        
+        // Now build the mesh with the tile map we made
+        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
 
-        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap);
+        // Now build the polycollider with the tile data
+        gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
     }
 }

@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
+//using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(PolygonCollider2D))]
 public class TileGraphics : MonoBehaviour {
     
-    public float tileSize = 1f;
-    [Space(10)]
     public Texture2D TileTexture;
     public int tileResolution;
 
@@ -57,7 +56,7 @@ public class TileGraphics : MonoBehaviour {
         mesh_renderer.sharedMaterials[0].mainTexture = texture;
     }
     
-    public void BuildMesh(TileMap tileMap)
+    public void BuildMesh(TileMap tileMap, float tileSize)
     {
         sizeX = tileMap.sizeX;
         sizeY = tileMap.sizeY;
@@ -90,8 +89,6 @@ public class TileGraphics : MonoBehaviour {
         
         //Prepare for polygon collider setting
         PolygonCollider2D poly_collider = GetComponent<PolygonCollider2D>();
-        ArrayList island = tileMap.Percolate(0, 0);
-        //island.Sort();
         
         //Calculate all tris
         for (y = 0; y < sizeY; y++)
