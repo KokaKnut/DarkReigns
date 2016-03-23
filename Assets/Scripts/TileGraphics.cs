@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(PolygonCollider2D))]
 public class TileGraphics : MonoBehaviour {
     
     public float tileSize = 1f;
@@ -87,7 +90,8 @@ public class TileGraphics : MonoBehaviour {
         
         //Prepare for polygon collider setting
         PolygonCollider2D poly_collider = GetComponent<PolygonCollider2D>();
-        tileMap.Percolate(0, 0);
+        ArrayList island = tileMap.Percolate(0, 0);
+        //island.Sort();
         
         //Calculate all tris
         for (y = 0; y < sizeY; y++)

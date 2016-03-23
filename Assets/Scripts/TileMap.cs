@@ -47,17 +47,25 @@ public class TileMap {
         if(x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
         {
             ArrayList island = new ArrayList();
-            island.Add(new int[] { x, y });
+            //island.Add(_tiles[x,y]);
+            return _Percolate(x, y, island);
         }
         return null;
     }
-
+    
     ArrayList _Percolate(int x, int y, ArrayList island)
     {
-        if (_tiles[x, y].type == Tile.TYPE.air)
+        if (x < 0 || x >= _sizeX || y < 0 || y >= _sizeY || _tiles[x, y].type == Tile.TYPE.air)
             return island;
-        if (island.Contains(new int[] { x, y }))
-            _Percolate(x,y,island);
+        if (!island.Contains(_tiles[x, y]))
+        {
+            island.Add(_tiles[x, y]);
+
+            island = _Percolate(x + 1, y, island);
+            island = _Percolate(x - 1, y, island);
+            island = _Percolate(x, y + 1, island);
+            island = _Percolate(x, y - 1, island);
+        }
         return island;
     }
 }

@@ -1,4 +1,7 @@
-﻿public class Tile {
+﻿using System;
+using System.Collections.Generic;
+
+public class Tile : IComparable<Tile> {
 
 	public enum TYPE
     {
@@ -6,7 +9,9 @@
         air
     }
 
-    TYPE _type;
+    private TYPE _type;
+    private int _x;
+    private int _y;
 
     public TYPE type
     {
@@ -20,8 +25,41 @@
         }
     }
 
-    public Tile(TYPE type)
+    public int x
     {
+        get
+        {
+            return _x;
+        }
+    }
+
+    public int y
+    {
+        get
+        {
+            return _y;
+        }
+    }
+
+    public int[] coordinates
+    {
+        get
+        {
+            return new int[] { x, y };
+        }
+    }
+
+    public Tile(int x, int y, TYPE type)
+    {
+        _x = x;
+        _y = y;
         this.type = type;
+    }
+
+    public int CompareTo(Tile other)
+    {
+        if (this.x == other.x)
+            return this.y.CompareTo(other.y);
+        return this.x.CompareTo(other.y);
     }
 }

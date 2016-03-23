@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(TileGraphics))]
 public class TileMapGenerator : MonoBehaviour {
 
     [Header("Size of Tile Map")]
@@ -21,10 +22,10 @@ public class TileMapGenerator : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                tileMap.SetTile(x,y, new Tile((Tile.TYPE)Random.Range(0, 2)));
+                tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)((int)Random.Range(0.0f, 1.1f))));
             }
         }
 
-        GetComponent<TileGraphics>().BuildMesh(tileMap);
+        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap);
     }
 }
