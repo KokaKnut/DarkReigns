@@ -10,8 +10,9 @@ public class TileCollision : MonoBehaviour {
     {
         //Prepare for polygon collider setting
         PolygonCollider2D poly_collider = GetComponent<PolygonCollider2D>();
-        poly_collider = new PolygonCollider2D();
+        //poly_collider = new PolygonCollider2D();
         poly_collider.CreatePrimitive(3, new Vector2(0.1f,0.1f));
+        poly_collider.pathCount = 0;
 
         ArrayList doneTiles = new ArrayList();
         int x = 0;
@@ -20,15 +21,21 @@ public class TileCollision : MonoBehaviour {
         {
             if (!(doneTiles.Contains(tileMap.GetTile(x, y))))
             {
-                ArrayList island = tileMap.Percolate(x, y);
-                island.Sort();
-                foreach (var tile in island)
+                List<Tile> island = tileMap.Percolate(x, y, new Tile.TYPE[] { Tile.TYPE.ground });
+                if (island.Count > 0)
                 {
-                    Debug.Log(tile.ToString());
-                    doneTiles.Add(tile);
+                    island.Sort();
+                    foreach (Tile tile in island)
+                    {
+                        Debug.Log(tile.ToString());
+                        doneTiles.Add(tile);
+                    }
+                    poly_collider.SetPath(poly_collider.pathCount++, GetBax());
                 }
-                poly_collider.pathCount++;
-                poly_collider.SetPath(poly_collider.pathCount, GetBox());
+                else
+                {
+                    doneTiles.Add(tileMap.GetTile(x, y));
+                }
             }
             x++;
             if(x >= tileMap.sizeX)
@@ -41,9 +48,39 @@ public class TileCollision : MonoBehaviour {
         
     }
 
-    Vector2[] GetBox()
+    Vector2[] GetBox(List<Tile> island, float tileSize)
     {
         List<Vector2> box = new List<Vector2>();
+        box.Add(new Vector2(island[0].x * tileSize, island[0].y * tileSize));
+
+        int direction = 0;
+        int length = 0;
+        do
+        {
+            switch (direction)
+            {
+                case 0:
+                    box.Add(new Vector2(box[box.Count - 1].x, box[box.Count - 1].y));
+                    length = 0;
+                    do
+                    {
+                        box[box.Count - 1].Set(box[box.Count - 1].x + tileSize, box[box.Count - 1].y);
+                    } while ((length + 1) < island.Count && island[length].y == island[length].y);
+                    break;
+                default:
+                    break;
+            }
+        } while (box[box.Count - 1] != box[0]);
+        return box.ToArray();
+    }
+
+    Vector2[] GetBax()
+    {
+        List<Vector2> box = new List<Vector2>();
+        box.Add(new Vector2(0, 0));
+        box.Add(new Vector2(1, 0));
+        box.Add(new Vector2(1, 1));
+        box.Add(new Vector2(0, 1));
         return box.ToArray();
     }
 }

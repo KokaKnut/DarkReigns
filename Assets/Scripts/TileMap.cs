@@ -44,17 +44,27 @@ public class TileMap {
             _tiles[x, y] = tile;
     }
 
-    public ArrayList Percolate(int x, int y)
+    public List<Tile> Percolate(int x, int y)
     {
         if(x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
         {
-            ArrayList island = new ArrayList();
+            List<Tile> island = new List<Tile>();
             return _Percolate(x, y, island, new Tile.TYPE[] { Tile.TYPE.air });
         }
         return null;
     }
-    
-    ArrayList _Percolate(int x, int y, ArrayList island, Tile.TYPE[] percType)
+
+    public List<Tile> Percolate(int x, int y, Tile.TYPE[] percType)
+    {
+        if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY && percType != null)
+        {
+            List<Tile> island = new List<Tile>();
+            return _Percolate(x, y, island, percType);
+        }
+        return null;
+    }
+
+    List<Tile> _Percolate(int x, int y, List<Tile> island, Tile.TYPE[] percType)
     {
         if (x < 0 || x >= _sizeX || y < 0 || y >= _sizeY)
             return island;
