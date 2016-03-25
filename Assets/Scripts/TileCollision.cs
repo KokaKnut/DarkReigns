@@ -14,6 +14,8 @@ public class TileCollision : MonoBehaviour {
         poly_collider.CreatePrimitive(3, new Vector2(0.1f,0.1f));
         poly_collider.pathCount = 0;
 
+        Test();
+
         ArrayList doneTiles = new ArrayList();
         int x = 0;
         int y = 0;
@@ -27,10 +29,9 @@ public class TileCollision : MonoBehaviour {
                     island.Sort();
                     foreach (Tile tile in island)
                     {
-                        Debug.Log(tile.ToString());
                         doneTiles.Add(tile);
                     }
-                    poly_collider.SetPath(poly_collider.pathCount++, GetBax());
+                    poly_collider.SetPath(poly_collider.pathCount++, GetBax(island, tileSize));
                 }
                 else
                 {
@@ -51,10 +52,11 @@ public class TileCollision : MonoBehaviour {
     Vector2[] GetBox(List<Tile> island, float tileSize)
     {
         List<Vector2> box = new List<Vector2>();
-        box.Add(new Vector2(island[0].x * tileSize, island[0].y * tileSize));
+        box.Add(new Vector2(island[1].x * tileSize, island[1].y * tileSize));
 
         int direction = 0;
         int length = 0;
+        int start = 0;
         do
         {
             switch (direction)
@@ -65,7 +67,9 @@ public class TileCollision : MonoBehaviour {
                     do
                     {
                         box[box.Count - 1].Set(box[box.Count - 1].x + tileSize, box[box.Count - 1].y);
-                    } while ((length + 1) < island.Count && island[length].y == island[length].y);
+                        length++;
+                    } while ((start + length + 1) < island.Count && island[start].y == island[start + length].y);
+                    return null;
                     break;
                 default:
                     break;
@@ -74,7 +78,7 @@ public class TileCollision : MonoBehaviour {
         return box.ToArray();
     }
 
-    Vector2[] GetBax()
+    Vector2[] GetBax(List<Tile> island, float tileSize)
     {
         List<Vector2> box = new List<Vector2>();
         box.Add(new Vector2(0, 0));
@@ -82,5 +86,18 @@ public class TileCollision : MonoBehaviour {
         box.Add(new Vector2(1, 1));
         box.Add(new Vector2(0, 1));
         return box.ToArray();
+    }
+
+    Stack<Vector2> Test()
+    {
+        Stack<Vector2> box = new Stack<Vector2>();
+        box.Push(new Vector2(0,0));
+        Vector2 point = box.Peek();
+        for (int i = 0; i < 20; i++)
+        {
+            box.Peek().Set(point.x + 1, point.y - 1);
+            point.Set(point.x + 1, point.y - 1);
+        }
+        return box;
     }
 }
