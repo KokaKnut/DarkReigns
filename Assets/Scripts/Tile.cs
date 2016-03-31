@@ -55,16 +55,44 @@ public class Tile : IComparable {
         _x = x;
         _y = y;
         this.type = type;
+        _CompareDel = CompareToX;
     }
+
+    //Allow for the IComparable interface to sort on a different axis
+    private delegate int _Comparison(Tile one, Tile other);
+    private _Comparison _CompareDel;
 
     public int CompareTo(Object other)
     {
-        if (other.GetType() != this.GetType())
+        return _CompareDel(this, (Tile)other);
+    }
+
+    public void SwapCompare()
+    {
+        if (_CompareDel == CompareToX)
+            _CompareDel = CompareToY;
+        else
+            _CompareDel = CompareToX;
+    }
+
+    public static int CompareToX(Tile one, Tile other)
+    {
+        if (other.GetType() != one.GetType())
             return 1;
         Tile otherTile = other as Tile;
-        if (this.x == otherTile.x)
-            return this.y.CompareTo(otherTile.y);
-        return this.x.CompareTo(otherTile.x);
+        if (one.x == otherTile.x)
+            return one.y.CompareTo(otherTile.y);
+        return one.x.CompareTo(otherTile.x);
+    }
+
+    public static int CompareToY(Tile one, Tile other)
+    {
+        if (other.GetType() != one.GetType())
+            return 1;
+        Tile otherTile = other as Tile;
+        if (one.y == otherTile.y)
+            return one.x.CompareTo(otherTile.x);
+        return one.y.CompareTo(otherTile.y);
     }
 
     public override string ToString()

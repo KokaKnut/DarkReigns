@@ -43,27 +43,25 @@ public class TileMap {
         if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
             _tiles[x, y] = tile;
     }
-
-    public List<Tile> Percolate(int x, int y)
-    {
-        if(x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
-        {
-            List<Tile> island = new List<Tile>();
-            return _Percolate(x, y, island, new Tile.TYPE[] { Tile.TYPE.air });
-        }
-        return null;
-    }
-
-    public List<Tile> Percolate(int x, int y, Tile.TYPE[] percType)
+    
+    /// <summary>
+    /// Percolates through tiles of the given types at the give coordinates
+    /// </summary>
+    /// <param name="x">X coordinate.</param>
+    /// <param name="y">Y coordinate.</param>
+    /// <param name="percType">Array of tile types.</param>
+    /// <returns>Returns an unsorted array of the tiles that percolated.</returns>
+    public Tile[] Percolate(int x, int y, Tile.TYPE[] percType)
     {
         if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY && percType != null)
         {
             List<Tile> island = new List<Tile>();
-            return _Percolate(x, y, island, percType);
+            return _Percolate(x, y, island, percType).ToArray();
         }
         return null;
     }
 
+    //the private percolation function
     List<Tile> _Percolate(int x, int y, List<Tile> island, Tile.TYPE[] percType)
     {
         if (x < 0 || x >= _sizeX || y < 0 || y >= _sizeY)

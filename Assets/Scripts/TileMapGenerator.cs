@@ -15,7 +15,7 @@ public class TileMapGenerator : MonoBehaviour {
     TileMap tileMap;
 
 	void Awake () {
-        BuildTileMap();
+        //BuildTileMap();
 	}
 
     [ContextMenu("Rebuild Tilemap")]
@@ -28,7 +28,7 @@ public class TileMapGenerator : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)((int)UnityEngine.Random.Range(0.0f, 1.1f))));
+                tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)((int)UnityEngine.Random.Range(0.0f, 1.0f))));
             }
         }
         
