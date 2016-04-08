@@ -13,10 +13,10 @@ public class TileMapGenerator : MonoBehaviour {
     public float tileSize = 1f;
     public float temp = 1f;
 
-    TileMap tileMap;
+    public TileMap tileMap;
 
 	void Awake () {
-        //BuildTileMap();
+        BuildTileMap();
 	}
 
     [ContextMenu("Rebuild Tilemap")]
@@ -25,23 +25,40 @@ public class TileMapGenerator : MonoBehaviour {
         tileMap = new TileMap(sizeX, sizeY);
 
         // temporary random tiles algorithm
-        for (int y = 0; y < sizeY; y++)
-        {
-            for (int x = 0; x < sizeX; x++)
-            {
-                tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)((int)UnityEngine.Random.Range(0.0f, temp))));
-            }
-        }
+        BuildSomeShit();
         
         // Now build the mesh with the tile map we made
         gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
 
         // Now build the polycollider with the tile data
-        //gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
+        gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
     }
 
-    [ContextMenu("Try Collision")]
-    public void TryCollision()
+    public void BuildSomeShit()
+    {
+        tileMap = new TileMap(sizeX, sizeY);
+
+        // temporary random tiles algorithm
+        for (int y = 0; y < sizeY; y++)
+        {
+            for (int x = 0; x < sizeX; x++)
+            {
+                if(y == 0)
+                    tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
+                else
+                    tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)( 2 - (int)UnityEngine.Random.Range(0.0f, temp + 1))));
+            }
+        }
+    }
+
+    [ContextMenu("Draw Textures")]
+    public void DrawTextures()
+    {
+        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
+    }
+
+    [ContextMenu("Draw Collision")]
+    public void DrawCollision()
     {
         gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
     }

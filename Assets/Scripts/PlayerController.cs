@@ -11,8 +11,10 @@ public class PlayerController : MonoBehaviour {
     private bool facingRight = true;
 
     public bool grounded = false;
+    public bool cielinged = false;
     private bool jumping = false;
     private float jumpClock = 0f;
+    private float jumpDuration = 0f;
 
 	// Use this for initialization
 	void Start () {
@@ -25,8 +27,11 @@ public class PlayerController : MonoBehaviour {
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTime), -jumpSpeed));
         else
         {
-            if (Time.fixedTime - jumpClock > jumpTime)
+            if (jumpDuration > jumpTime || cielinged)
+            {
+                jumpDuration = 0f;
                 jumping = false;
+            }
         }
     }
 
@@ -37,6 +42,15 @@ public class PlayerController : MonoBehaviour {
             jumping = true;
             jumpClock = Time.fixedTime;
             rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
+        }
+        if (jump && jumping)
+        {
+            jumpDuration += Time.fixedTime - jumpClock;
+            jumpClock = Time.fixedTime;
+        }
+        if (!jump)
+        {
+            jumping = false;
         }
 
         rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
