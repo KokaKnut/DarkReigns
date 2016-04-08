@@ -84,12 +84,12 @@ public class TileCollision : MonoBehaviour {
                     for (length = 0; (startx + length < islandX.Length)
                         && (islandX[startx].y == islandX[startx + length].y)
                         && (islandX[startx].x == islandX[startx + length].x - length)
-                        && (Array.BinarySearch(islandX, new Tile(islandX[startx + length].x, islandX[startx + length].y - 1, islandX[startx].type)) < 0); length++) ;
+                        && (Array.BinarySearch(islandX, new Tile(islandX[startx + length].x, islandX[startx + length].y - 1, islandX[startx].type, 'Y')) < 0); length++);
                     box.Add(new Vector2(box[box.Count - 1].x + (length * tileSize), box[box.Count - 1].y));
                     length--;
-                    if (Array.BinarySearch(islandX, new Tile(islandX[startx + length].x + 1, islandX[startx].y - 1, islandX[startx].type)) > 0)
+                    if (Array.BinarySearch(islandX, new Tile(islandX[startx + length].x + 1, islandX[startx].y - 1, islandX[startx].type, 'Y')) > 0)
                     {
-                        startx = Array.BinarySearch(islandX, new Tile(islandX[startx + length].x + 1, islandX[startx].y - 1, islandX[startx].type));
+                        startx = Array.BinarySearch(islandX, new Tile(islandX[startx + length].x + 1, islandX[startx].y - 1, islandX[startx].type, 'Y'));
                         direction = "-y";
                     }
                     else
@@ -106,9 +106,9 @@ public class TileCollision : MonoBehaviour {
                         && (Array.BinarySearch(islandY, new Tile(islandY[starty + length].x + 1, islandY[starty + length].y, islandY[starty].type)) < 0); length++) ;
                     box.Add(new Vector2(box[box.Count - 1].x, box[box.Count - 1].y + (length * tileSize)));
                     length--;
-                    if (Array.BinarySearch(islandY, new Tile(islandY[starty].x + 1, islandY[starty + length].y + 1, islandY[starty].type, 'Y')) > 0)
+                    if (Array.BinarySearch(islandY, new Tile(islandY[starty].x + 1, islandY[starty + length].y + 1, islandY[starty].type)) > 0)
                     {
-                        starty = Array.BinarySearch(islandY, new Tile(islandY[starty].x + 1, islandY[starty + length].y + 1, islandY[starty].type, 'Y'));
+                        starty = Array.BinarySearch(islandY, new Tile(islandY[starty].x + 1, islandY[starty + length].y + 1, islandY[starty].type));
                         direction = "+x";
                     }
                     else
@@ -122,12 +122,12 @@ public class TileCollision : MonoBehaviour {
                     for (length = 0; (startx - length >= 0)
                         && (islandX[startx].y == islandX[startx - length].y)
                         && (islandX[startx].x == islandX[startx - length].x + length)
-                        && (Array.BinarySearch(islandX, new Tile(islandX[startx - length].x, islandX[startx - length].y + 1, islandX[startx].type)) < 0); length++) ;
+                        && (Array.BinarySearch(islandX, new Tile(islandX[startx - length].x, islandX[startx - length].y + 1, islandX[startx].type, 'Y')) < 0); length++) ;
                     box.Add(new Vector2(box[box.Count - 1].x - (length * tileSize), box[box.Count - 1].y));
                     length--;
-                    if (Array.BinarySearch(islandX, new Tile(islandX[startx - length].x - 1, islandX[startx].y + 1, islandX[startx].type)) > 0)
+                    if (Array.BinarySearch(islandX, new Tile(islandX[startx - length].x - 1, islandX[startx].y + 1, islandX[startx].type, 'Y')) > 0)
                     {
-                        startx = Array.BinarySearch(islandX, new Tile(islandX[startx - length].x - 1, islandX[startx].y + 1, islandX[startx].type));
+                        startx = Array.BinarySearch(islandX, new Tile(islandX[startx - length].x - 1, islandX[startx].y + 1, islandX[startx].type, 'Y'));
                         direction = "+y";
                     }
                     else
@@ -144,9 +144,9 @@ public class TileCollision : MonoBehaviour {
                         && (Array.BinarySearch(islandY, new Tile(islandY[starty - length].x - 1, islandY[starty - length].y, islandY[starty].type)) < 0); length++) ;
                     box.Add(new Vector2(box[box.Count - 1].x, box[box.Count - 1].y - (length * tileSize)));
                     length--;
-                    if (Array.BinarySearch(islandY, new Tile(islandY[starty].x - 1, islandY[starty - length].y - 1, islandY[starty].type,'Y')) > 0)
+                    if (Array.BinarySearch(islandY, new Tile(islandY[starty].x - 1, islandY[starty - length].y - 1, islandY[starty].type)) >= 0)
                     {
-                        starty = Array.BinarySearch(islandY, new Tile(islandY[starty].x - 1, islandY[starty - length].y - 1, islandY[starty].type, 'Y'));
+                        starty = Array.BinarySearch(islandY, new Tile(islandY[starty].x - 1, islandY[starty - length].y - 1, islandY[starty].type));
                         direction = "-x";
                     }
                     else
