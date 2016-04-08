@@ -11,6 +11,7 @@ public class TileMapGenerator : MonoBehaviour {
     public int sizeX;
     public int sizeY;
     public float tileSize = 1f;
+    public float temp = 1f;
 
     TileMap tileMap;
 
@@ -28,7 +29,7 @@ public class TileMapGenerator : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)((int)UnityEngine.Random.Range(0.0f, 1.0f))));
+                tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)((int)UnityEngine.Random.Range(0.0f, temp))));
             }
         }
         
@@ -36,6 +37,12 @@ public class TileMapGenerator : MonoBehaviour {
         gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
 
         // Now build the polycollider with the tile data
+        //gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
+    }
+
+    [ContextMenu("Try Collision")]
+    public void TryCollision()
+    {
         gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
     }
 }

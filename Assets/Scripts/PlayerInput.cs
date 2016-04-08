@@ -12,9 +12,7 @@ public class PlayerInput : MonoBehaviour {
 	
     void Update()
     {
-        bool jump = Input.GetKeyDown(KeyCode.Space);
 
-        player.Move(0f, 0f, jump);
     }
 
 	// Update is called once per frame
@@ -29,7 +27,7 @@ public class PlayerInput : MonoBehaviour {
         y = (Input.GetKey(KeyCode.S) ? y - 1 : y);
         y = (Input.GetKey(KeyCode.W) ? y + 1 : y);
 
-        bool jump = Input.GetKeyDown(KeyCode.Space);
+        bool jump = Input.GetKey(KeyCode.Space);
 
         player.Move(x, 0f, jump);
     }

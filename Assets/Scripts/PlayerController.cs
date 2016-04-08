@@ -5,9 +5,14 @@ public class PlayerController : MonoBehaviour {
 
     private Rigidbody2D rb;
     public float runSpeed = 1f;
-    public float jumpHeight = 2f;
+    public float jumpSpeed = 1f;
+    public float jumpTime = .3f;
+    public float hangTime = .2f;
     private bool facingRight = true;
+
     public bool grounded = false;
+    private bool jumping = false;
+    private float jumpClock = 0f;
 
 	// Use this for initialization
 	void Start () {
@@ -16,13 +21,23 @@ public class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate() {
-        
+        if (!jumping)
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTime), -jumpSpeed));
+        else
+        {
+            if (Time.fixedTime - jumpClock > jumpTime)
+                jumping = false;
+        }
     }
 
     public void Move(float x, float y, bool jump)
     {
         if (jump && grounded)
-            rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
+        {
+            jumping = true;
+            jumpClock = Time.fixedTime;
+            rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
+        }
 
         rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
 

@@ -58,6 +58,14 @@ public class Tile : IComparable {
         _CompareDel = CompareToX;
     }
 
+    public Tile(int x, int y, TYPE type, Char c)
+    {
+        _x = x;
+        _y = y;
+        this.type = type;
+        SetCompare(c);
+    }
+
     //Allow for the IComparable interface to sort on a different axis
     private delegate int _Comparison(Tile one, Tile other);
     private _Comparison _CompareDel;
@@ -67,9 +75,9 @@ public class Tile : IComparable {
         return _CompareDel(this, (Tile)other);
     }
 
-    public void SwapCompare()
+    public void SetCompare(Char c)
     {
-        if (_CompareDel == CompareToX)
+        if (c == 'Y')
             _CompareDel = CompareToY;
         else
             _CompareDel = CompareToX;
@@ -97,6 +105,6 @@ public class Tile : IComparable {
 
     public override string ToString()
     {
-        return type + " at: " + x + ", " + y;
+        return type + " at: " + x + ", " + y + ", " + _CompareDel.Method.Name;
     }
 }

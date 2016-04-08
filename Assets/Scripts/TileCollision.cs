@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 [RequireComponent(typeof(PolygonCollider2D))]
 public class TileCollision : MonoBehaviour {
-    
+
     public void BuildCollider(TileMap tileMap, float tileSize)
     {
         //Prepare for polygon collider setting
@@ -52,17 +52,17 @@ public class TileCollision : MonoBehaviour {
 
     Vector2[] GetBox(Tile[] islandY, float tileSize)
     {
-        // Get another array sorted on the other axis
+        // Get another array to sort on the other axis
         Tile[] islandX = new Tile[islandY.Length];
-        Array.Copy(islandY, islandX, islandY.Length);
-        Array.Sort(islandY);
 
-        // Swap the Comparison method so ICompare interface can binary search properly
+        // Copy the array and swap the Comparison method so ICompare interface can binary search properly
         for (int i = 0; i < islandX.Length; i++)
         {
-            islandX[i].SwapCompare();
+            islandX[i] = new Tile(islandY[i].x, islandY[i].y, islandY[i].type);
+            islandX[i].SetCompare('Y');
         }
 
+        Array.Sort(islandY);
         Array.Sort(islandX);
 
         // Start the collision box with the first point
@@ -74,67 +74,87 @@ public class TileCollision : MonoBehaviour {
         int length = 0;
         int startx = 0;
         int starty = 0;
-
         // the crazy loop of doom, under construction
         do
         {
+            print("box length: " + box.Count + ", box point: " + box[box.Count - 1].x + ", " + box[box.Count - 1].y);
             switch (direction)
             {
                 case "+x":
                     for (length = 0; (startx + length < islandX.Length)
                         && (islandX[startx].y == islandX[startx + length].y)
                         && (islandX[startx].x == islandX[startx + length].x - length)
-                        && (Array.BinarySearch(islandX, new Tile(islandX[startx + length].x, islandX[startx + length].y - 1, islandX[startx].type)) < 0); length++);
+                        && (Array.BinarySearch(islandX, new Tile(islandX[startx + length].x, islandX[startx + length].y - 1, islandX[startx].type)) < 0); length++) ;
                     box.Add(new Vector2(box[box.Count - 1].x + (length * tileSize), box[box.Count - 1].y));
-                    startx += length - 1;
-                    if (Array.BinarySearch(islandY, new Tile(islandX[startx].x, islandX[startx].y - 1, islandX[startx].type)) > 0)
+                    length--;
+                    if (Array.BinarySearch(islandX, new Tile(islandX[startx + length].x + 1, islandX[startx].y - 1, islandX[startx].type)) > 0)
+                    {
+                        startx = Array.BinarySearch(islandX, new Tile(islandX[startx + length].x + 1, islandX[startx].y - 1, islandX[startx].type));
                         direction = "-y";
+                    }
                     else
+                    {
+                        startx += length;
                         direction = "+y";
+                    }
                     starty = Array.BinarySearch(islandY, new Tile(islandX[startx].x, islandX[startx].y, islandX[startx].type));
                     break;
                 case "+y":
                     for (length = 0; (starty + length < islandY.Length)
                         && (islandY[starty].x == islandY[starty + length].x)
                         && (islandY[starty].y == islandY[starty + length].y - length)
-                        && (Array.BinarySearch(islandY, new Tile(islandY[starty + length].x - 1, islandY[starty + length].y, islandY[starty].type)) < 0); length++)
-                        print((starty + length < islandY.Length)
-                        && (islandY[starty].x == islandY[starty + length].x)
-                        && (islandY[starty].y == islandY[starty + length].y - length)
-                        && (Array.BinarySearch(islandY, new Tile(islandY[starty + length].x - 1, islandY[starty + length].y, islandY[starty].type)) < 0));
+                        && (Array.BinarySearch(islandY, new Tile(islandY[starty + length].x + 1, islandY[starty + length].y, islandY[starty].type)) < 0); length++) ;
                     box.Add(new Vector2(box[box.Count - 1].x, box[box.Count - 1].y + (length * tileSize)));
-                    starty += length - 1;
-                    if (Array.BinarySearch(islandX, new Tile(islandY[starty].x - 1, islandY[starty].y, islandY[starty].type)) > 0)
+                    length--;
+                    if (Array.BinarySearch(islandY, new Tile(islandY[starty].x + 1, islandY[starty + length].y + 1, islandY[starty].type, 'Y')) > 0)
+                    {
+                        starty = Array.BinarySearch(islandY, new Tile(islandY[starty].x + 1, islandY[starty + length].y + 1, islandY[starty].type, 'Y'));
                         direction = "+x";
+                    }
                     else
+                    {
+                        starty += length;
                         direction = "-x";
-                    startx = Array.BinarySearch(islandX, new Tile(islandY[starty].x, islandY[starty].y, islandY[starty].type));
+                    }
+                    startx = Array.BinarySearch(islandX, new Tile(islandY[starty].x, islandY[starty].y, islandY[starty].type, 'Y'));
                     break;
                 case "-x":
                     for (length = 0; (startx - length >= 0)
                         && (islandX[startx].y == islandX[startx - length].y)
                         && (islandX[startx].x == islandX[startx - length].x + length)
-                        && (Array.BinarySearch(islandY, new Tile(islandX[startx - length].x, islandX[startx - length].y + 1, islandX[startx].type)) < 0); length++);
+                        && (Array.BinarySearch(islandX, new Tile(islandX[startx - length].x, islandX[startx - length].y + 1, islandX[startx].type)) < 0); length++) ;
                     box.Add(new Vector2(box[box.Count - 1].x - (length * tileSize), box[box.Count - 1].y));
-                    startx -= length;
-                    if (Array.BinarySearch(islandY, new Tile(islandX[startx].x, islandX[startx].y + 1, islandX[startx].type)) > 0)
+                    length--;
+                    if (Array.BinarySearch(islandX, new Tile(islandX[startx - length].x - 1, islandX[startx].y + 1, islandX[startx].type)) > 0)
+                    {
+                        startx = Array.BinarySearch(islandX, new Tile(islandX[startx - length].x - 1, islandX[startx].y + 1, islandX[startx].type));
                         direction = "+y";
+                    }
                     else
+                    {
+                        startx -= length;
                         direction = "-y";
+                    }
                     starty = Array.BinarySearch(islandY, new Tile(islandX[startx].x, islandX[startx].y, islandX[startx].type));
                     break;
                 case "-y":
                     for (length = 0; (starty - length >= 0)
                         && (islandY[starty].x == islandY[starty - length].x)
                         && (islandY[starty].y == islandY[starty - length].y + length)
-                        && (Array.BinarySearch(islandX, new Tile(islandY[starty - length].x + 1, islandY[starty - length].y, islandY[starty].type)) < 0); length++);
+                        && (Array.BinarySearch(islandY, new Tile(islandY[starty - length].x - 1, islandY[starty - length].y, islandY[starty].type)) < 0); length++) ;
                     box.Add(new Vector2(box[box.Count - 1].x, box[box.Count - 1].y - (length * tileSize)));
-                    starty -= length;
-                    if (Array.BinarySearch(islandX, new Tile(islandY[starty].x + 1, islandY[starty].y, islandY[starty].type)) > 0)
+                    length--;
+                    if (Array.BinarySearch(islandY, new Tile(islandY[starty].x - 1, islandY[starty - length].y - 1, islandY[starty].type,'Y')) > 0)
+                    {
+                        starty = Array.BinarySearch(islandY, new Tile(islandY[starty].x - 1, islandY[starty - length].y - 1, islandY[starty].type, 'Y'));
                         direction = "-x";
+                    }
                     else
+                    {
+                        starty -= length;
                         direction = "+x";
-                    startx = Array.BinarySearch(islandX, new Tile(islandY[starty].x, islandY[starty].y, islandY[starty].type));
+                    }
+                    startx = Array.BinarySearch(islandX, new Tile(islandY[starty].x, islandY[starty].y, islandY[starty].type, 'Y'));
                     break;
             }
         } while (box[box.Count - 1] != box[0] && box.Count < 1000);

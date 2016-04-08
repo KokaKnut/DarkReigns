@@ -87,9 +87,6 @@ public class TileGraphics : MonoBehaviour {
             }
         }
         
-        //Prepare for polygon collider setting
-        PolygonCollider2D poly_collider = GetComponent<PolygonCollider2D>();
-        
         //Calculate all tris
         for (y = 0; y < sizeY; y++)
         {
@@ -105,15 +102,6 @@ public class TileGraphics : MonoBehaviour {
                 triangles[triOffset + 3] = y * vsizeX + x + 0;
                 triangles[triOffset + 4] = y * vsizeX + x + vsizeX + 1;
                 triangles[triOffset + 5] = y * vsizeX + x + 1;
-
-                //Poly collider section
-                Vector2[] box = new Vector2[4];
-                box[0] = new Vector2(verticies[triangles[triOffset + 0]].x, verticies[triangles[triOffset + 0]].y);
-                box[1] = new Vector2(verticies[triangles[triOffset + 1]].x, verticies[triangles[triOffset + 1]].y);
-                box[2] = new Vector2(verticies[triangles[triOffset + 2]].x, verticies[triangles[triOffset + 2]].y);
-                box[3] = new Vector2(verticies[triangles[triOffset + 5]].x, verticies[triangles[triOffset + 5]].y);
-                poly_collider.pathCount++;
-                poly_collider.SetPath(y * sizeX + x, box);
             }
         }
 
