@@ -43,7 +43,9 @@ public class TileGraphics : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                Color[] p = tiles[(int)tileMap.GetTile(x,y).type];
+                Color[] p = tiles[(int)tileMap.GetTile(x, y).type];
+                if (tileMap.GetTile(x, y).type == Tile.TYPE.ground)
+                    p = tiles[10];
                 texture.SetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution, p);
             }
         }

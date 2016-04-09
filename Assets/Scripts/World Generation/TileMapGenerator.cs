@@ -18,8 +18,7 @@ public class TileMapGenerator : MonoBehaviour {
 	void Awake () {
         BuildTileMap();
 	}
-
-    [ContextMenu("Rebuild Tilemap")]
+    
     public void BuildTileMap()
     {
         tileMap = new TileMap(sizeX, sizeY);
@@ -34,6 +33,7 @@ public class TileMapGenerator : MonoBehaviour {
         gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
     }
 
+    [ContextMenu("Rebuild Tilemap")]
     public void BuildSomeShit()
     {
         tileMap = new TileMap(sizeX, sizeY);
@@ -43,10 +43,10 @@ public class TileMapGenerator : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                if(y == 0)
+                if(y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1)
                     tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
                 else
-                    tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)( 2 - (int)UnityEngine.Random.Range(0.0f, temp + 1))));
+                    tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)(int)UnityEngine.Random.Range(temp, 2f)));
             }
         }
     }
