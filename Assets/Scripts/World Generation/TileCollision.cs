@@ -9,9 +9,9 @@ public class TileCollision : MonoBehaviour {
     public Tile.TYPE[] solid;
     public Tile.TYPE[] air;
 
-    public void BuildCollider(TileMap tileMap, float tileSize)
+    // remove all of the edge colliders that were already on the gameObject
+    public void RemoveCollision()
     {
-        // remove all of the edge colliders that were already on the gameObject
         if (Application.isEditor)
             foreach (EdgeCollider2D col in GetComponents<EdgeCollider2D>())
             {
@@ -22,6 +22,12 @@ public class TileCollision : MonoBehaviour {
             {
                 Destroy(col);
             }
+    }
+
+    public void BuildCollider(TileMap tileMap, float tileSize)
+    {
+        // remove all of the edge colliders that were already on the gameObject
+        RemoveCollision();
 
         //run through percolation of all tiles, set collision for all islands
         // TODO: right now collision is made for outer edges only, being inside is a problem.

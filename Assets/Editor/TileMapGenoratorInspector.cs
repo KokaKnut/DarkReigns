@@ -1,6 +1,5 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using System.Collections;
 
 [CustomEditor(typeof(TileMapGenerator))]
 public class TileMapGenoratorInspector : Editor {

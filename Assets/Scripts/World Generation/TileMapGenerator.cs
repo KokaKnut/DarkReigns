@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 
+[RequireComponent(typeof(TileMap))]
 [RequireComponent(typeof(TileGraphics))]
 [RequireComponent(typeof(TileCollision))]
 public class TileMapGenerator : MonoBehaviour {
@@ -11,9 +9,16 @@ public class TileMapGenerator : MonoBehaviour {
     public int sizeX;
     public int sizeY;
     public float tileSize = 1f;
-    public float temp = 1f;
 
-    public TileMap tileMap;
+    [Header("Generation vars")]
+    public float temp = 1f;
+    public bool border = true;
+    public bool collison = true;
+
+    [Header("Pregenerated Content")]
+    public TileMap[] prefabs;
+
+    private TileMap tileMap;
 
 	void Awake () {
         BuildTileMap();
@@ -21,7 +26,8 @@ public class TileMapGenerator : MonoBehaviour {
     
     public void BuildTileMap()
     {
-        tileMap = new TileMap(sizeX, sizeY);
+        tileMap = GetComponent<TileMap>();
+        tileMap.NewTileMap(sizeX, sizeY);
 
         // temporary random tiles algorithm
         BuildSomeShit();
@@ -30,23 +36,40 @@ public class TileMapGenerator : MonoBehaviour {
         gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
 
         // Now build the polycollider with the tile data
-        gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
+        if (collison)
+            gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
+        else
+            gameObject.GetComponent<TileCollision>().RemoveCollision();
     }
 
     [ContextMenu("Rebuild Tilemap")]
     public void BuildSomeShit()
     {
-        tileMap = new TileMap(sizeX, sizeY);
+        tileMap = GetComponent<TileMap>();
+
 
         // temporary random tiles algorithm
-        for (int y = 0; y < sizeY; y++)
+        if (border)
         {
-            for (int x = 0; x < sizeX; x++)
+            for (int y = 0; y < sizeY; y++)
             {
-                if(y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1)
-                    tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
-                else
+                for (int x = 0; x < sizeX; x++)
+                {
+                    if (y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1)
+                        tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
+                    else
+                        tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)(int)UnityEngine.Random.Range(temp, 2f)));
+                }
+            }
+        }
+        else
+        {
+            for (int y = 0; y < sizeY; y++)
+            {
+                for (int x = 0; x < sizeX; x++)
+                {
                     tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)(int)UnityEngine.Random.Range(temp, 2f)));
+                }
             }
         }
     }

@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
 public class Tile : IComparable {
 
 	public enum TYPE
     {
         ground,
-        air
+        air,
+        spawn,
+        shrine
     }
 
     private TYPE _type;

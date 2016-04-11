@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
-//using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class TileGraphics : MonoBehaviour {
     
-    public Texture2D TileTexture;
+    public Texture2D tileTexture;
     public int tileResolution;
 
     int sizeX = 0;
@@ -15,8 +14,8 @@ public class TileGraphics : MonoBehaviour {
 
     Color[][] ChopUpTiles()
     {
-        int numTilesPerRow = TileTexture.width / tileResolution;
-        int numRows = TileTexture.height / tileResolution;
+        int numTilesPerRow = tileTexture.width / tileResolution;
+        int numRows = tileTexture.height / tileResolution;
 
         Color[][] tiles = new Color[numTilesPerRow * numRows][];
 
@@ -24,7 +23,7 @@ public class TileGraphics : MonoBehaviour {
         {
             for (int x = 0; x < numTilesPerRow; x++)
             {
-                tiles[y * numTilesPerRow + x] = TileTexture.GetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution);
+                tiles[y * numTilesPerRow + x] = tileTexture.GetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution);
             }
         }
 

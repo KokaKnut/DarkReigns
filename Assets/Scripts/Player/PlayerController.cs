@@ -16,8 +16,13 @@ public class PlayerController : MonoBehaviour {
     private float jumpClock = 0f;
     private float jumpDuration = 0f;
 
+    void Awake()
+    {
+        //transform.position = spawnpos
+    }
+
 	// Use this for initialization
-	void Start () {
+	void Start() {
         rb = GetComponent<Rigidbody2D>();
 	}
 
