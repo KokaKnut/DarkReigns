@@ -20,7 +20,7 @@ public class TileMapInspector : Editor
             if (GUILayout.Button("Make Data Structure"))
             {
                 ((TileMap)target).prefab = false;
-                ((TileMap)target).gameObject.GetComponent<TileMapPrefabBuilder>().DestroyImmediate();
+                ((TileMap)target).gameObject.GetComponent<TileMapPrefabBuilder>().Disable();
             }
         }
         else

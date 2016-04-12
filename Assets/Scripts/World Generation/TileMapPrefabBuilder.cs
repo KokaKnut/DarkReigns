@@ -4,6 +4,8 @@ using System;
 
 [RequireComponent(typeof(TileMap))]
 public class TileMapPrefabBuilder : MonoBehaviour {
+    // for removing this object
+    public bool killme = false;
 
 	public TileMap tileMap = null;
     public bool preview = false;
@@ -17,18 +19,21 @@ public class TileMapPrefabBuilder : MonoBehaviour {
     {
         get
         {
-            return new Vector2(gameObject.GetComponent<TileMap>().sizeX, gameObject.GetComponent<TileMap>().sizeY);
+            return new Vector2(tileMap.sizeX, tileMap.sizeY);
         }
         set
         {
-            gameObject.GetComponent<TileMap>().sizeX = (int)value.x;
-            gameObject.GetComponent<TileMap>().sizeY = (int)value.y;
+            tileMap.sizeX = (int)value.x;
+            tileMap.sizeY = (int)value.y;
         }
     }
 
-    public void DestroyImmediate()
+    // for removing this object
+    public void Disable()
     {
-        //DestroyImmediate()
-        throw new NotImplementedException();
+        DestroyImmediate(tg);
+        DestroyImmediate(gameObject.GetComponent<MeshRenderer>());
+        DestroyImmediate(gameObject.GetComponent<MeshFilter>());
+        killme = true;
     }
 }

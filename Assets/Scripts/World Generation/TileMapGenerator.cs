@@ -47,7 +47,7 @@ public class TileMapGenerator : MonoBehaviour {
     {
         tileMap = GetComponent<TileMap>();
 
-
+        int rand = 0;
         // temporary random tiles algorithm
         if (border)
         {
@@ -68,7 +68,11 @@ public class TileMapGenerator : MonoBehaviour {
             {
                 for (int x = 0; x < sizeX; x++)
                 {
-                    tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)(int)UnityEngine.Random.Range(temp, 2f)));
+                    rand = (int)UnityEngine.Random.Range(temp, 2f);
+                    if (rand == 0)
+                        tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
+                    else
+                        tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.air));
                 }
             }
         }

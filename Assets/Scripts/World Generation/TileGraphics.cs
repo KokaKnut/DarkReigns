@@ -1,6 +1,14 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class TileTypeGraphics
+{
+    public Tile.TYPE type = Tile.TYPE.none;
+    public int index = 0;
+}
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -8,6 +16,8 @@ public class TileGraphics : MonoBehaviour {
     
     public Texture2D tileTexture;
     public int tileResolution;
+    public TileTypeGraphics[] tileTypes;
+    public Dictionary<Tile.TYPE, TileTypeGraphics> tileTypesDefinitions;
 
     int sizeX = 0;
     int sizeY = 0;
@@ -38,13 +48,17 @@ public class TileGraphics : MonoBehaviour {
 
         Color[][] tiles = ChopUpTiles();
 
+        tileTypesDefinitions = new Dictionary<Tile.TYPE, TileTypeGraphics>();
+        foreach (TileTypeGraphics def in tileTypes)
+        {
+            tileTypesDefinitions[def.type] = def;
+        }
+
         for (int y = 0; y < sizeY; y++)
         {
             for (int x = 0; x < sizeX; x++)
             {
-                Color[] p = tiles[(int)tileMap.GetTile(x, y).type];
-                if (tileMap.GetTile(x, y).type == Tile.TYPE.ground)
-                    p = tiles[10];
+                Color[] p = tiles[tileTypesDefinitions[tileMap.GetTile(x, y).type].index];
                 texture.SetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution, p);
             }
         }

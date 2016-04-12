@@ -4,6 +4,7 @@ public class Tile : IComparable {
 
 	public enum TYPE
     {
+        none,
         ground,
         air,
         spawn,
