@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour {
     public float jumpSpeed = 1f;
     public float jumpTime = .3f;
     public float hangTime = .2f;
+    public int jumpCount = 1;
+
     private bool facingRight = true;
 
     public bool grounded = false;
@@ -15,6 +17,8 @@ public class PlayerController : MonoBehaviour {
     private bool jumping = false;
     private float jumpClock = 0f;
     private float jumpDuration = 0f;
+
+    private SpriteRenderer sprite;
 
     void Awake()
     {
@@ -24,12 +28,21 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start() {
         rb = GetComponent<Rigidbody2D>();
-	}
+        sprite = GetComponentInChildren<SpriteRenderer>();
+    }
 
-    // Update is called once per frame
+    void LateUpdate()
+    {
+        sprite.transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z);
+    }
+
+
     void FixedUpdate() {
         if (!jumping)
+        {
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTime), -jumpSpeed));
+            jumpDuration = 0f;
+        }
         else
         {
             if (jumpDuration > jumpTime || cielinged)
@@ -79,11 +92,6 @@ public class PlayerController : MonoBehaviour {
         // Switch the way the player is labelled as facing.
         facingRight = !facingRight;
 
-        GetComponent<SpriteRenderer>().flipX = !GetComponent<SpriteRenderer>().flipX;
-
-        /*// Multiply the player's x local scale by -1.
-        Vector3 theScale = transform.localScale;
-        theScale.x *= -1;
-        transform.localScale = theScale; */
+        sprite.flipX = !sprite.flipX;
     }
 }

@@ -17,6 +17,7 @@ public class TileMapInspector : Editor
     {
         if (prefab.boolValue)
         {
+            GUI.color = Color.red;
             if (GUILayout.Button("Make Data Structure"))
             {
                 ((TileMap)target).prefab = false;
@@ -25,10 +26,12 @@ public class TileMapInspector : Editor
         }
         else
         {
+            GUI.color = Color.green;
             if (GUILayout.Button("Make Prefab"))
             {
                 ((TileMap)target).prefab = true;
-                ((TileMap)target).gameObject.AddComponent<TileMapPrefabBuilder>();
+                if (((TileMap)target).gameObject.GetComponent<TileMapPrefabBuilder>() == null)
+                    ((TileMap)target).gameObject.AddComponent<TileMapPrefabBuilder>();
             }
         }
     }

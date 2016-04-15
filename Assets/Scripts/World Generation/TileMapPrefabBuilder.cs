@@ -14,6 +14,12 @@ public class TileMapPrefabBuilder : MonoBehaviour {
     public int textureRes = 0;
     public Texture2D tileTexture = null;
     public Material mat = null;
+    public TileTextureDefs tileDefs = null;
+
+    void Awake()
+    {
+        Disable();
+    }
 
     public Vector2 size
     {

@@ -16,7 +16,7 @@ public class TileMapGenerator : MonoBehaviour {
     public bool collison = true;
 
     [Header("Pregenerated Content")]
-    public TileMap[] prefabs;
+    public TileMapPrefabDefs prefabs;
 
     private TileMap tileMap;
 
@@ -47,8 +47,21 @@ public class TileMapGenerator : MonoBehaviour {
     {
         tileMap = GetComponent<TileMap>();
 
-        int rand = 0;
         // temporary random tiles algorithm
+        int rand = 0;
+        for (int y = 0; y < sizeY; y++)
+        {
+            for (int x = 0; x < sizeX; x++)
+            {
+                rand = (int)UnityEngine.Random.Range(temp, 2f);
+                if (rand == 0)
+                    tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
+                else
+                    tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.air));
+            }
+        }
+
+
         if (border)
         {
             for (int y = 0; y < sizeY; y++)
@@ -57,22 +70,6 @@ public class TileMapGenerator : MonoBehaviour {
                 {
                     if (y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1)
                         tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
-                    else
-                        tileMap.SetTile(x, y, new Tile(x, y, (Tile.TYPE)(int)UnityEngine.Random.Range(temp, 2f)));
-                }
-            }
-        }
-        else
-        {
-            for (int y = 0; y < sizeY; y++)
-            {
-                for (int x = 0; x < sizeX; x++)
-                {
-                    rand = (int)UnityEngine.Random.Range(temp, 2f);
-                    if (rand == 0)
-                        tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
-                    else
-                        tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.air));
                 }
             }
         }

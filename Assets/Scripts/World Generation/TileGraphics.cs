@@ -3,21 +3,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
-public class TileTypeGraphics
-{
-    public Tile.TYPE type = Tile.TYPE.none;
-    public int index = 0;
-}
-
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class TileGraphics : MonoBehaviour {
     
     public Texture2D tileTexture;
     public int tileResolution;
-    public TileTypeGraphics[] tileTypes;
-    public Dictionary<Tile.TYPE, TileTypeGraphics> tileTypesDefinitions;
+    public TileTextureDefs tileDefs;
+    private Dictionary<Tile.TYPE, TileTypeGraphics> tileTypesDefinitions;
 
     int sizeX = 0;
     int sizeY = 0;
@@ -49,7 +42,7 @@ public class TileGraphics : MonoBehaviour {
         Color[][] tiles = ChopUpTiles();
 
         tileTypesDefinitions = new Dictionary<Tile.TYPE, TileTypeGraphics>();
-        foreach (TileTypeGraphics def in tileTypes)
+        foreach (TileTypeGraphics def in tileDefs.tileTypes)
         {
             tileTypesDefinitions[def.type] = def;
         }
@@ -58,7 +51,7 @@ public class TileGraphics : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                Color[] p = tiles[tileTypesDefinitions[tileMap.GetTile(x, y).type].index];
+                Color[] p = tiles[tileTypesDefinitions[tileMap.GetTile(x, y).type].top1];
                 texture.SetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution, p);
             }
         }

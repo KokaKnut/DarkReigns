@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 
 public class TileMap : MonoBehaviour {
@@ -27,9 +28,15 @@ public class TileMap : MonoBehaviour {
         if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
             _tiles[x, y] = tile;
     }
-    
+
+    public void SetTile(int x, int y, Tile.TYPE type)
+    {
+        if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
+            _tiles[x, y].type = type;
+    }
+
     /// <summary>
-    /// Percolates through tiles of the given types at the give coordinates
+    /// Percolates through tiles of the given types at the given coordinates
     /// </summary>
     /// <param name="x">X coordinate.</param>
     /// <param name="y">Y coordinate.</param>
@@ -50,11 +57,8 @@ public class TileMap : MonoBehaviour {
     {
         if (x < 0 || x >= sizeX || y < 0 || y >= sizeY)
             return island;
-        for (int i = 0; i < percType.Length; i++)
-        {
-            if (_tiles[x, y].type != percType[i])
-                return island;
-        }
+        if (!(Array.Exists(percType, tile => tile == _tiles[x, y].type)))
+            return island;
         if (!island.Contains(_tiles[x, y]))
         {
             island.Add(_tiles[x, y]);

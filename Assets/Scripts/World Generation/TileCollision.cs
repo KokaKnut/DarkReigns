@@ -30,7 +30,6 @@ public class TileCollision : MonoBehaviour {
         RemoveCollision();
 
         //run through percolation of all tiles, set collision for all islands
-        // TODO: right now collision is made for outer edges only, being inside is a problem.
         ArrayList doneTiles = new ArrayList();
         int x = 0;
         int y = 0;
