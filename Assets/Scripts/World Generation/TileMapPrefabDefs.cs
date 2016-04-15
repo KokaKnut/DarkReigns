@@ -4,9 +4,9 @@ using System.Collections;
 [System.Serializable]
 public class TileMapPrefabDef
 {
-    TileMap tileMap;
-    bool unique;
-    float rarity;
+    public TileMap tileMap;
+    public bool unique;
+    public float rarity;
 }
 
 public class TileMapPrefabDefs : MonoBehaviour {

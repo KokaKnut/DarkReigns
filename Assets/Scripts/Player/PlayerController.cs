@@ -22,7 +22,8 @@ public class PlayerController : MonoBehaviour {
 
     void Awake()
     {
-        //transform.position = spawnpos
+        Vector3 spawnpos = GameObject.FindGameObjectWithTag("")
+        transform.position = spawnpos;
     }
 
 	// Use this for initialization
@@ -30,13 +31,7 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponentInChildren<SpriteRenderer>();
     }
-
-    void LateUpdate()
-    {
-        sprite.transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z);
-    }
-
-
+    
     void FixedUpdate() {
         if (!jumping)
         {
