@@ -1,22 +1,24 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
-//using System.Collections.Generic;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class TileGraphics : MonoBehaviour {
     
-    public Texture2D TileTexture;
+    public Texture2D tileTexture;
     public int tileResolution;
+    public TileTextureDefs tileDefs;
+    private Dictionary<Tile.TYPE, TileTypeGraphics> tileTypesDefinitions;
 
     int sizeX = 0;
     int sizeY = 0;
 
     Color[][] ChopUpTiles()
     {
-        int numTilesPerRow = TileTexture.width / tileResolution;
-        int numRows = TileTexture.height / tileResolution;
+        int numTilesPerRow = tileTexture.width / tileResolution;
+        int numRows = tileTexture.height / tileResolution;
 
         Color[][] tiles = new Color[numTilesPerRow * numRows][];
 
@@ -24,7 +26,7 @@ public class TileGraphics : MonoBehaviour {
         {
             for (int x = 0; x < numTilesPerRow; x++)
             {
-                tiles[y * numTilesPerRow + x] = TileTexture.GetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution);
+                tiles[y * numTilesPerRow + x] = tileTexture.GetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution);
             }
         }
 
@@ -39,11 +41,17 @@ public class TileGraphics : MonoBehaviour {
 
         Color[][] tiles = ChopUpTiles();
 
+        tileTypesDefinitions = new Dictionary<Tile.TYPE, TileTypeGraphics>();
+        foreach (TileTypeGraphics def in tileDefs.tileTypes)
+        {
+            tileTypesDefinitions[def.type] = def;
+        }
+
         for (int y = 0; y < sizeY; y++)
         {
             for (int x = 0; x < sizeX; x++)
             {
-                Color[] p = tiles[(int)tileMap.GetTile(x,y).type];
+                Color[] p = tiles[tileTypesDefinitions[tileMap.GetTile(x, y).type].top1];
                 texture.SetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution, p);
             }
         }

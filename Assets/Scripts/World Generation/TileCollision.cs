@@ -3,40 +3,70 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(PolygonCollider2D))]
+//[RequireComponent(typeof(EdgeCollider2D))]
 public class TileCollision : MonoBehaviour {
+
+    public Tile.TYPE[] solid;
+    public Tile.TYPE[] air;
+
+    // remove all of the edge colliders that were already on the gameObject
+    public void RemoveCollision()
+    {
+        if (Application.isEditor)
+            foreach (EdgeCollider2D col in GetComponents<EdgeCollider2D>())
+            {
+                DestroyImmediate(col);
+            }
+        else
+            foreach (EdgeCollider2D col in GetComponents<EdgeCollider2D>())
+            {
+                Destroy(col);
+            }
+    }
 
     public void BuildCollider(TileMap tileMap, float tileSize)
     {
-        //Prepare for polygon collider setting
-        PolygonCollider2D poly_collider = GetComponent<PolygonCollider2D>();
-
-        //this resets the collider
-        poly_collider.CreatePrimitive(3, new Vector2(0.1f,0.1f));
-        poly_collider.pathCount = 0;
+        // remove all of the edge colliders that were already on the gameObject
+        RemoveCollision();
 
         //run through percolation of all tiles, set collision for all islands
-        // TODO: right now collision is made for outer edges only, being inside will bounce you out.
         ArrayList doneTiles = new ArrayList();
         int x = 0;
         int y = 0;
-        while (tileMap.sizeX * tileMap.sizeY > doneTiles.Count)
+        while (tileMap.sizeX * tileMap.sizeY > doneTiles.Count || y < tileMap.sizeY)
         {
             if (!(doneTiles.Contains(tileMap.GetTile(x, y))))
             {
-                Tile[] island = tileMap.Percolate(x, y, new Tile.TYPE[] { Tile.TYPE.ground });
+                Tile[] island = tileMap.Percolate(x, y, solid);
                 if (island.Length > 0)
                 {
                     Array.Sort(island);
-                    foreach (Tile tile in island)
-                    {
-                        doneTiles.Add(tile);
-                    }
-                    poly_collider.SetPath(poly_collider.pathCount++, GetBox(island, tileSize));
+                    EdgeCollider2D edge_collider = gameObject.AddComponent<EdgeCollider2D>();
+                    edge_collider.hideFlags = HideFlags.HideInInspector;
+                    edge_collider.points = GetBox(island, tileSize);
                 }
                 else
                 {
-                    doneTiles.Add(tileMap.GetTile(x, y));
+                    island = tileMap.Percolate(x, y, air);
+                    Array.Sort(island);
+                    if (!(island[0].x == 0 || island[island.Length - 1].x == tileMap.sizeX - 1))
+                    {
+                        for (int i = 0; i < island.Length; i++)
+                        {
+                            island[i].SetCompare('Y');
+                        }
+                        Array.Sort(island);
+                        if (!(island[0].y == 0 || island[island.Length - 1].y == tileMap.sizeX - 1))
+                        {
+                            EdgeCollider2D edge_collider = gameObject.AddComponent<EdgeCollider2D>();
+                            edge_collider.hideFlags = HideFlags.HideInInspector;
+                            edge_collider.points = GetBox(island, tileSize);
+                        }
+                    }
+                }
+                foreach (Tile tile in island)
+                {
+                    doneTiles.Add(tile);
                 }
             }
             x++;
@@ -54,6 +84,11 @@ public class TileCollision : MonoBehaviour {
     {
         // Get another array to sort on the other axis
         Tile[] islandX = new Tile[islandY.Length];
+
+        for (int i = 0; i < islandY.Length; i++)
+        {
+            islandY[i].SetCompare('X');
+        }
 
         // Copy the array and swap the Comparison method so ICompare interface can binary search properly
         for (int i = 0; i < islandX.Length; i++)
@@ -156,19 +191,7 @@ public class TileCollision : MonoBehaviour {
                     startx = Array.BinarySearch(islandX, new Tile(islandY[starty].x, islandY[starty].y, islandY[starty].type, 'Y'));
                     break;
             }
-        } while (box[box.Count - 1] != box[0] && box.Count < 1000);
-        box.RemoveAt(box.Count - 1);
-        return box.ToArray();
-    }
-
-    //for testing purposes only, remove when GetBox functions properly
-    Vector2[] GetBax(Tile[] island, float tileSize)
-    {
-        List<Vector2> box = new List<Vector2>();
-        box.Add(new Vector2(0, 0));
-        box.Add(new Vector2(1, 0));
-        box.Add(new Vector2(1, 1));
-        box.Add(new Vector2(0, 1));
+        } while (box[box.Count - 1] != box[0] && box.Count < 4000);
         return box.ToArray();
     }
 }
