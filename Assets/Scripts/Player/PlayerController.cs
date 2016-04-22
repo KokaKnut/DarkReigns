@@ -22,12 +22,12 @@ public class PlayerController : MonoBehaviour {
 
     void Awake()
     {
-        Vector3 spawnpos = GameObject.FindGameObjectWithTag("")
-        transform.position = spawnpos;
+        
     }
 
 	// Use this for initialization
 	void Start() {
+        gameObject.transform.position = GameObject.FindGameObjectWithTag("World").GetComponent<TileMapGenerator>().SpawnPos();
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponentInChildren<SpriteRenderer>();
     }

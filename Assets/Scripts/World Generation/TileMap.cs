@@ -7,7 +7,13 @@ public class TileMap : MonoBehaviour {
     Tile[,] _tiles;
     public int sizeX;
     public int sizeY;
+
+    //prefabed tilemap data
     public bool prefab = false;
+    public int[] top;
+    public int[] bot;
+    public int[] left;
+    public int[] right;
 
     public void NewTileMap(int x, int y)
     {
@@ -34,6 +40,83 @@ public class TileMap : MonoBehaviour {
         if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
             _tiles[x, y].type = type;
     }
+
+    public int topSize
+    {
+        get
+        {
+            return top.Length;
+        }
+        set
+        {
+            if (value > sizeX)
+                value = sizeX;
+            if (value < 0)
+                value = 0;
+            int[] temp = new int[value];
+            for (int i = 0; i < value && i < top.Length; i++)
+                temp[i] = top[i];
+            top = temp;
+        }
+    }
+
+    public int botSize
+    {
+        get
+        {
+            return bot.Length;
+        }
+        set
+        {
+            if (value > sizeX)
+                value = sizeX;
+            if (value < 0)
+                value = 0;
+            int[] temp = new int[value];
+            for (int i = 0; i < value && i < bot.Length; i++)
+                temp[i] = bot[i];
+            bot = temp;
+        }
+    }
+
+    public int leftSize
+    {
+        get
+        {
+            return left.Length;
+        }
+        set
+        {
+            if (value > sizeY)
+                value = sizeY;
+            if (value < 0)
+                value = 0;
+            int[] temp = new int[value];
+            for (int i = 0; i < value && i < left.Length; i++)
+                temp[i] = left[i];
+            left = temp;
+        }
+    }
+
+    public int rightSize
+    {
+        get
+        {
+            return right.Length;
+        }
+        set
+        {
+            if (value > sizeY)
+                value = sizeY;
+            if (value < 0)
+                value = 0;
+            int[] temp = new int[value];
+            for (int i = 0; i < value && i < right.Length; i++)
+                temp[i] = right[i];
+            right = temp;
+        }
+    }
+
 
     /// <summary>
     /// Percolates through tiles of the given types at the given coordinates

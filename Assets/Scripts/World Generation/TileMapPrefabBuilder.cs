@@ -3,11 +3,12 @@ using System.Collections;
 using System;
 
 [RequireComponent(typeof(TileMap))]
-public class TileMapPrefabBuilder : MonoBehaviour {
+public class TileMapPrefabBuilder : MonoBehaviour
+{
     // for removing this object
     public bool killme = false;
 
-	public TileMap tileMap = null;
+    public TileMap tileMap = null;
     public bool preview = false;
     public TileGraphics tg;
     public float tileSize = 0f;

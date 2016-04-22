@@ -1,5 +1,7 @@
-﻿using System;
+﻿using UnityEngine;
+using System;
 
+[System.Serializable]
 public class Tile : IComparable {
 
 	public enum TYPE
@@ -7,6 +9,7 @@ public class Tile : IComparable {
         none,
         ground,
         air,
+        ladder,
         spawn,
         shrine
     }
@@ -71,7 +74,7 @@ public class Tile : IComparable {
     private delegate int _Comparison(Tile one, Tile other);
     private _Comparison _CompareDel;
 
-    public int CompareTo(Object other)
+    public int CompareTo(System.Object other)
     {
         return _CompareDel(this, (Tile)other);
     }

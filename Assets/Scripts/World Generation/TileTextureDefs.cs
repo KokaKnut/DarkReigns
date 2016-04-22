@@ -30,7 +30,8 @@ public class TileTypeGraphics
     public int bot5 = 0;
 }
 
-public class TileTextureDefs : MonoBehaviour {
+public class TileTextureDefs : MonoBehaviour
+{
 
     public TileTypeGraphics[] tileTypes;
 }

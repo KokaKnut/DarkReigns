@@ -9,7 +9,8 @@ public class TileMapPrefabDef
     public float rarity;
 }
 
-public class TileMapPrefabDefs : MonoBehaviour {
+public class TileMapPrefabDefs : MonoBehaviour
+{
 
     public TileMapPrefabDef[] prefabTypes;
 }

@@ -6,7 +6,13 @@ using System.Collections;
 public class TileMapPrefabBuilderInspector : Editor {
 
     Vector2 selectorCoord = new Vector2();
+    Vector2 selectorSnap = new Vector2();
     Tile.TYPE selectorType = Tile.TYPE.none;
+
+    bool topExp;
+    bool botExp;
+    bool leftExp;
+    bool rightExp;
 
     void OnEnable()
     {
@@ -29,6 +35,11 @@ public class TileMapPrefabBuilderInspector : Editor {
         ((TileMapPrefabBuilder)target).tileTexture = (Texture2D)EditorGUILayout.ObjectField("Texture", ((TileMapPrefabBuilder)target).tileTexture, typeof(Texture2D), true);
         ((TileMapPrefabBuilder)target).tileDefs = (TileTextureDefs)EditorGUILayout.ObjectField("Texture Defs", ((TileMapPrefabBuilder)target).tileDefs, typeof(TileTextureDefs), true);
 
+        if (GUILayout.Button("Build/Reset Tilemap"))
+            GenerateTileMap();
+
+        EditorGUILayout.Separator();
+
         if (!((TileMapPrefabBuilder)target).preview)
         {
             GUI.color = Color.green;
@@ -37,7 +48,6 @@ public class TileMapPrefabBuilderInspector : Editor {
                 if (((TileMapPrefabBuilder)target).tileTexture != null && ((TileMapPrefabBuilder)target).mat != null)
                 {
                     ((TileMapPrefabBuilder)target).preview = !((TileMapPrefabBuilder)target).preview;
-                    GenerateTileMap();
                     ((TileMapPrefabBuilder)target).tg = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
                     if (((TileMapPrefabBuilder)target).tg == null)
                     {
@@ -75,14 +85,67 @@ public class TileMapPrefabBuilderInspector : Editor {
         }
 
         selectorCoord = EditorGUILayout.Vector2Field("Coordinate to Edit", selectorCoord);
+        selectorSnap = EditorGUILayout.Vector2Field("Selector to Snap by", selectorSnap);
         selectorType = (Tile.TYPE)EditorGUILayout.EnumPopup(selectorType);
 
         GUI.color = new Color(1f, 1f, .4f, 1f);
         if (GUILayout.Button("Change Selected Tile"))
         {
             ((TileMapPrefabBuilder)target).tileMap.SetTile((int)selectorCoord.x, (int)selectorCoord.y, selectorType);
+            selectorCoord += selectorSnap;
         }
         GUI.color = Color.white;
+
+        GUILayout.Space(10);
+        GUILayout.Label("Keep these hidden when not in use");
+
+        topExp = EditorGUILayout.Foldout(topExp, "Top Openings");
+        if (topExp)
+        {
+            ((TileMapPrefabBuilder)target).tileMap.topSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.topSize);
+            int[] top = ((TileMapPrefabBuilder)target).tileMap.top;
+            for(int i=0; i < top.Length; i++)
+            {
+                top[i] = EditorGUILayout.IntField(i + ":", top[i]);
+            }
+            ((TileMapPrefabBuilder)target).tileMap.top = top;
+        }
+
+        botExp = EditorGUILayout.Foldout(botExp, "Bot Openings");
+        if (botExp)
+        {
+            ((TileMapPrefabBuilder)target).tileMap.botSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.botSize);
+            int[] bot = ((TileMapPrefabBuilder)target).tileMap.top;
+            for (int i = 0; i < bot.Length; i++)
+            {
+                bot[i] = EditorGUILayout.IntField(i + ":", bot[i]);
+            }
+            ((TileMapPrefabBuilder)target).tileMap.top = bot;
+        }
+
+        leftExp = EditorGUILayout.Foldout(leftExp, "Left Openings");
+        if (leftExp)
+        {
+            ((TileMapPrefabBuilder)target).tileMap.leftSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.leftSize);
+            int[] left = ((TileMapPrefabBuilder)target).tileMap.top;
+            for (int i = 0; i < left.Length; i++)
+            {
+                left[i] = EditorGUILayout.IntField(i + ":", left[i]);
+            }
+            ((TileMapPrefabBuilder)target).tileMap.top = left;
+        }
+
+        rightExp = EditorGUILayout.Foldout(rightExp, "Right Openings");
+        if (rightExp)
+        {
+            ((TileMapPrefabBuilder)target).tileMap.rightSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.rightSize);
+            int[] right = ((TileMapPrefabBuilder)target).tileMap.right;
+            for (int i = 0; i < right.Length; i++)
+            {
+                right[i] = EditorGUILayout.IntField(i + ":", right[i]);
+            }
+            ((TileMapPrefabBuilder)target).tileMap.top = right;
+        }
     }
 
     void GenerateTileMap()
