@@ -14,8 +14,11 @@ public class Tile : IComparable {
         shrine
     }
 
+    [SerializeField]
     private TYPE _type;
+    [SerializeField]
     private int _x;
+    [SerializeField]
     private int _y;
 
     public TYPE type

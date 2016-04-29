@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class TileMap : MonoBehaviour {
 
     [SerializeField]
-    Tile[] _tiles;
+    private Tile[] tiles;
 
     [SerializeField]
     private int _sizeX;
@@ -46,29 +46,29 @@ public class TileMap : MonoBehaviour {
     {
         _sizeX = x;
         _sizeY = y;
-        _tiles = new Tile[x + y * _sizeX];
+        tiles = new Tile[x + y * _sizeX];
     }
 
     public Tile GetTile(int x, int y)
     {
         if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
-            return _tiles[x + y * _sizeX];
+            return tiles[x + y * _sizeX];
         return null;
     }
 
     public void SetTile(int x, int y, Tile tile)
     {
         if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
-            _tiles[x + y * _sizeX] = tile;
+            tiles[x + y * _sizeX] = tile;
     }
 
     public void SetTile(int x, int y, Tile.TYPE type)
     {
         if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
         {
-            if (_tiles[x + y * _sizeX] != null)
+            if (tiles[x + y * _sizeX] != null)
             {
-                _tiles[x + y * _sizeX].type = type;
+                tiles[x + y * _sizeX].type = type;
             }
             else
             {
@@ -176,11 +176,11 @@ public class TileMap : MonoBehaviour {
     {
         if (x < 0 || x >= _sizeX || y < 0 || y >= _sizeY)
             return island;
-        if (!(Array.Exists(percType, tile => tile == _tiles[x + y * _sizeX].type)))
+        if (!(Array.Exists(percType, tile => tile == tiles[x + y * _sizeX].type)))
             return island;
-        if (!island.Contains(_tiles[x + y * _sizeX]))
+        if (!island.Contains(tiles[x + y * _sizeX]))
         {
-            island.Add(_tiles[x + y * _sizeX]);
+            island.Add(tiles[x + y * _sizeX]);
 
             island = _Percolate(x + 1, y, island, percType);
             island = _Percolate(x - 1, y, island, percType);
@@ -197,7 +197,7 @@ public class TileMap : MonoBehaviour {
         {
             for (int x = 0; x < _sizeX; x++)
             {
-                GetTile(x, y).ToString();
+                print(GetTile(x, y).ToString());
             }
         }
     }

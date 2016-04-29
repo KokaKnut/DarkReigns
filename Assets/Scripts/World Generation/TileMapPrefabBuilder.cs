@@ -3,6 +3,9 @@ using System.Collections;
 using System;
 
 [RequireComponent(typeof(TileMap))]
+[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(TileGraphics))]
 public class TileMapPrefabBuilder : MonoBehaviour
 {
     // for removing this object
@@ -17,17 +20,27 @@ public class TileMapPrefabBuilder : MonoBehaviour
 
     void Awake()
     {
-        tg.enabled = false;
-        gameObject.GetComponent<MeshRenderer>().enabled = false;
-        this.enabled = false;
+        Disable();
     }
 
-    // for removing this object
+    [ContextMenu("Hide Contents")]
     public void Disable()
     {
-        DestroyImmediate(tg);
-        DestroyImmediate(gameObject.GetComponent<MeshRenderer>());
-        DestroyImmediate(gameObject.GetComponent<MeshFilter>());
+        gameObject.GetComponent<TileGraphics>().enabled = false;
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        enabled = false;
+    }
+
+    [ContextMenu("Show Contents")]
+    public void Enable()
+    {
+        gameObject.GetComponent<TileGraphics>().enabled = true;
+        gameObject.GetComponent<MeshRenderer>().enabled = true;
+        enabled = true;
+    }
+
+    public void Destroy()
+    {
         killme = true;
     }
 }
