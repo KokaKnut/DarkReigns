@@ -4,9 +4,36 @@ using System.Collections.Generic;
 
 public class TileMap : MonoBehaviour {
 
-    Tile[,] _tiles;
-    public int sizeX;
-    public int sizeY;
+    [SerializeField]
+    Tile[] _tiles;
+
+    [SerializeField]
+    private int _sizeX;
+    public int sizeX
+    {
+        get
+        {
+            return _sizeX;
+        }
+    }
+
+    [SerializeField]
+    private int _sizeY;
+    public int sizeY
+    {
+        get
+        {
+            return _sizeY;
+        }
+    }
+
+    public Vector2 size
+    {
+        get
+        {
+            return new Vector2(_sizeX, _sizeY);
+        }
+    }
 
     //prefabed tilemap data
     public bool prefab = false;
@@ -17,28 +44,37 @@ public class TileMap : MonoBehaviour {
 
     public void NewTileMap(int x, int y)
     {
-        sizeX = x;
-        sizeY = y;
-        _tiles = new Tile[x, y];
+        _sizeX = x;
+        _sizeY = y;
+        _tiles = new Tile[x + y * _sizeX];
     }
 
     public Tile GetTile(int x, int y)
     {
-        if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
-            return _tiles[x, y];
+        if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
+            return _tiles[x + y * _sizeX];
         return null;
     }
 
     public void SetTile(int x, int y, Tile tile)
     {
-        if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
-            _tiles[x, y] = tile;
+        if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
+            _tiles[x + y * _sizeX] = tile;
     }
 
     public void SetTile(int x, int y, Tile.TYPE type)
     {
-        if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
-            _tiles[x, y].type = type;
+        if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY)
+        {
+            if (_tiles[x + y * _sizeX] != null)
+            {
+                _tiles[x + y * _sizeX].type = type;
+            }
+            else
+            {
+                print("Tile does not exist: " + x + ", " + y);
+            }
+        }
     }
 
     public int topSize
@@ -49,8 +85,8 @@ public class TileMap : MonoBehaviour {
         }
         set
         {
-            if (value > sizeX)
-                value = sizeX;
+            if (value > _sizeX)
+                value = _sizeX;
             if (value < 0)
                 value = 0;
             int[] temp = new int[value];
@@ -68,8 +104,8 @@ public class TileMap : MonoBehaviour {
         }
         set
         {
-            if (value > sizeX)
-                value = sizeX;
+            if (value > _sizeX)
+                value = _sizeX;
             if (value < 0)
                 value = 0;
             int[] temp = new int[value];
@@ -87,8 +123,8 @@ public class TileMap : MonoBehaviour {
         }
         set
         {
-            if (value > sizeY)
-                value = sizeY;
+            if (value > _sizeY)
+                value = _sizeY;
             if (value < 0)
                 value = 0;
             int[] temp = new int[value];
@@ -106,8 +142,8 @@ public class TileMap : MonoBehaviour {
         }
         set
         {
-            if (value > sizeY)
-                value = sizeY;
+            if (value > _sizeY)
+                value = _sizeY;
             if (value < 0)
                 value = 0;
             int[] temp = new int[value];
@@ -127,7 +163,7 @@ public class TileMap : MonoBehaviour {
     /// <returns>Returns an unsorted array of the tiles that percolated.</returns>
     public Tile[] Percolate(int x, int y, Tile.TYPE[] percType)
     {
-        if (x >= 0 && x < sizeX && y >= 0 && y < sizeY && percType != null)
+        if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY && percType != null)
         {
             List<Tile> island = new List<Tile>();
             return _Percolate(x, y, island, percType).ToArray();
@@ -138,13 +174,13 @@ public class TileMap : MonoBehaviour {
     //the private percolation function
     List<Tile> _Percolate(int x, int y, List<Tile> island, Tile.TYPE[] percType)
     {
-        if (x < 0 || x >= sizeX || y < 0 || y >= sizeY)
+        if (x < 0 || x >= _sizeX || y < 0 || y >= _sizeY)
             return island;
-        if (!(Array.Exists(percType, tile => tile == _tiles[x, y].type)))
+        if (!(Array.Exists(percType, tile => tile == _tiles[x + y * _sizeX].type)))
             return island;
-        if (!island.Contains(_tiles[x, y]))
+        if (!island.Contains(_tiles[x + y * _sizeX]))
         {
-            island.Add(_tiles[x, y]);
+            island.Add(_tiles[x + y * _sizeX]);
 
             island = _Percolate(x + 1, y, island, percType);
             island = _Percolate(x - 1, y, island, percType);
@@ -152,5 +188,17 @@ public class TileMap : MonoBehaviour {
             island = _Percolate(x, y - 1, island, percType);
         }
         return island;
+    }
+
+    [ContextMenu("Print Contents")]
+    public void PrintContents()
+    {
+        for (int y = 0; y < _sizeY; y++)
+        {
+            for (int x = 0; x < _sizeX; x++)
+            {
+                GetTile(x, y).ToString();
+            }
+        }
     }
 }
