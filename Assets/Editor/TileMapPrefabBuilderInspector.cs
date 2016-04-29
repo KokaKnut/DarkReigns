@@ -74,15 +74,17 @@ public class TileMapPrefabBuilderInspector : Editor {
             {
                 if (((TileMapPrefabBuilder)target).mat != null)
                 {
+                    //swap the value for preview
                     preview.boolValue = !preview.boolValue;
+                    //find the tile graphics component
                     tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
-                    if (tg.objectReferenceValue == null)
-                    {
-                        ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshRenderer>().sharedMaterial = ((TileMapPrefabBuilder)target).mat;
-                        tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
-                    }
+                    //set the material for the mesh renderer to the one we have in the inspector
+                    ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshRenderer>().sharedMaterial = ((TileMapPrefabBuilder)target).mat;
+                    //give tilegraphics the tile definitions
                     ((TileGraphics)tg.objectReferenceValue).tileDefs = (TileTextureDefs)tileDefs.objectReferenceValue;
+                    //build the mesh
                     ((TileGraphics)tg.objectReferenceValue).BuildMesh((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
+                    //enable the components for rendering
                     ((TileMapPrefabBuilder)target).Enable();
                 }
                 else
@@ -123,6 +125,7 @@ public class TileMapPrefabBuilderInspector : Editor {
         GUI.color = Color.white;
 
         GUILayout.Space(10);
+        //The following are used for the opeinings in the prefab. Openings being where prefabs can be entered and exited.
         GUILayout.Label("Keep these hidden when not in use");
 
         topExp = EditorGUILayout.Foldout(topExp, "Top Openings");
@@ -172,9 +175,6 @@ public class TileMapPrefabBuilderInspector : Editor {
             }
             ((TileMapPrefabBuilder)target).tileMap.top = right;
         }
-
-
-        //EditorUtility.SetDirty(((TileMapPrefabBuilder)target).tileMap);
 
         serializedObject.ApplyModifiedProperties();
         serializedObject.Update();        
