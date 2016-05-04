@@ -23,6 +23,11 @@ public class TileMapPrefabBuilderInspector : Editor {
     SerializedProperty preview;
     SerializedProperty tg;
 
+    SerializedProperty top;
+    SerializedProperty bot;
+    SerializedProperty left;
+    SerializedProperty right;
+
     void OnEnable()
     {
         ((TileMapPrefabBuilder)target).tileMap = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileMap>();
@@ -33,15 +38,17 @@ public class TileMapPrefabBuilderInspector : Editor {
         tg = serializedObject.FindProperty("tg");
         size = ((TileMapPrefabBuilder)target).tileMap.size;
 
+        top = serializedObject.FindProperty("tileMap.top");
+        
         ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshFilter>().hideFlags = HideFlags.HideInInspector;
         ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshRenderer>().hideFlags = HideFlags.HideInInspector;
         tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
         ((TileGraphics)tg.objectReferenceValue).hideFlags = HideFlags.HideInInspector;
 
-        ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshFilter>().hideFlags = HideFlags.None;
+        /*((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshFilter>().hideFlags = HideFlags.None;
         ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshRenderer>().hideFlags = HideFlags.None;
         tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
-        ((TileGraphics)tg.objectReferenceValue).hideFlags = HideFlags.None;
+        ((TileGraphics)tg.objectReferenceValue).hideFlags = HideFlags.None;*/
     }
 
     public override void OnInspectorGUI()
@@ -49,7 +56,11 @@ public class TileMapPrefabBuilderInspector : Editor {
         // removes the builder safely if marked for destruction
         if (((TileMapPrefabBuilder)target).killme && Event.current.type == EventType.Repaint)
         {
+            TileMap TM = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileMap>();
             DestroyImmediate((TileMapPrefabBuilder)target);
+            DestroyImmediate(TM.gameObject.GetComponent<TileGraphics>());
+            DestroyImmediate(TM.gameObject.GetComponent<MeshFilter>());
+            DestroyImmediate(TM.gameObject.GetComponent<MeshRenderer>());
             return;
         }
 
@@ -144,24 +155,24 @@ public class TileMapPrefabBuilderInspector : Editor {
         if (botExp)
         {
             ((TileMapPrefabBuilder)target).tileMap.botSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.botSize);
-            int[] bot = ((TileMapPrefabBuilder)target).tileMap.top;
+            int[] bot = ((TileMapPrefabBuilder)target).tileMap.bot;
             for (int i = 0; i < bot.Length; i++)
             {
                 bot[i] = EditorGUILayout.IntField(i + ":", bot[i]);
             }
-            ((TileMapPrefabBuilder)target).tileMap.top = bot;
+            ((TileMapPrefabBuilder)target).tileMap.bot = bot;
         }
 
         leftExp = EditorGUILayout.Foldout(leftExp, "Left Openings");
         if (leftExp)
         {
             ((TileMapPrefabBuilder)target).tileMap.leftSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.leftSize);
-            int[] left = ((TileMapPrefabBuilder)target).tileMap.top;
+            int[] left = ((TileMapPrefabBuilder)target).tileMap.left;
             for (int i = 0; i < left.Length; i++)
             {
                 left[i] = EditorGUILayout.IntField(i + ":", left[i]);
             }
-            ((TileMapPrefabBuilder)target).tileMap.top = left;
+            ((TileMapPrefabBuilder)target).tileMap.left = left;
         }
 
         rightExp = EditorGUILayout.Foldout(rightExp, "Right Openings");
@@ -173,11 +184,11 @@ public class TileMapPrefabBuilderInspector : Editor {
             {
                 right[i] = EditorGUILayout.IntField(i + ":", right[i]);
             }
-            ((TileMapPrefabBuilder)target).tileMap.top = right;
+            ((TileMapPrefabBuilder)target).tileMap.right = right;
         }
 
         serializedObject.ApplyModifiedProperties();
-        serializedObject.Update();        
+        serializedObject.Update();
     }
 
     void GenerateTileMap()

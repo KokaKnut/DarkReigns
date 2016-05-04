@@ -197,7 +197,7 @@ public class TileMap : MonoBehaviour {
         {
             for (int x = 0; x < _sizeX; x++)
             {
-                print(GetTile(x, y).ToString());
+                print(GetTile(x, y).ToUnityString());
             }
         }
     }

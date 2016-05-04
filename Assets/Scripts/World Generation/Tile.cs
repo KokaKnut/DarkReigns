@@ -74,7 +74,8 @@ public class Tile : IComparable {
     }
 
     //Allow for the IComparable interface to sort on a different axis
-    private delegate int _Comparison(Tile one, Tile other);
+    public delegate int _Comparison(Tile one, Tile other);
+    [SerializeField]
     private _Comparison _CompareDel;
 
     public int CompareTo(System.Object other)
@@ -113,5 +114,10 @@ public class Tile : IComparable {
     public override string ToString()
     {
         return type + " at: " + x + ", " + y + ", " + _CompareDel.Method.Name;
+    }
+
+    public string ToUnityString()
+    {
+        return type + " at: " + x + ", " + y;
     }
 }

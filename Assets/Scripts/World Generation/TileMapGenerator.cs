@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(TileMap))]
 [RequireComponent(typeof(TileGraphics))]
@@ -44,22 +45,6 @@ public class TileMapGenerator : MonoBehaviour {
 
     public void GenerateWorld()
     {
-        for (int y = 0; y < sizeY; y++)
-        {
-            for (int x = 0; x < sizeX; x++)
-            {
-                tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.air));
-            }
-        }
-
-        foreach(TileMapPrefabDef prefab in prefabs.prefabTypes)
-        {
-            if(Random.value < prefab.rarity)
-            {
-
-            }
-        }
-
         if (border)
         {
             for (int y = 0; y < sizeY; y++)
@@ -69,6 +54,45 @@ public class TileMapGenerator : MonoBehaviour {
                     if (y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1)
                         tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
                 }
+            }
+        }
+
+        List<TileMapPrefabDef> uniques = new List<TileMapPrefabDef>();
+        foreach(TileMapPrefabDef prefab in prefabs.prefabTypes)
+        {
+            if (prefab.unique)
+                uniques.Add(prefab);
+        }
+
+        List<TileMapPrefabDef> commons = new List<TileMapPrefabDef>();
+        foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
+        {
+            if (!(prefab.unique))
+                uniques.Add(prefab);
+        }
+        
+        foreach (TileMapPrefabDef prefab in uniques)
+        {
+            if (prefab.rarity == 1.0f)
+            {
+                for (int y = 0; y < prefab.tileMap.sizeY; y++)
+                {
+                    for (int x = 0; x < prefab.tileMap.sizeX; x++)
+                    {
+                        tileMap.SetTile(x + (int)prefab.coords.x, y + (int)prefab.coords.y, new Tile(x + (int)prefab.coords.x, y + (int)prefab.coords.y, prefab.tileMap.GetTile(x, y).type));
+                    }
+                }
+            }
+        }
+
+        
+
+        for (int y = 0; y < sizeY; y++)
+        {
+            for (int x = 0; x < sizeX; x++)
+            {
+                if (tileMap.GetTile(x, y) == null)
+                    tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.air));
             }
         }
     }
@@ -125,7 +149,7 @@ public class TileMapGenerator : MonoBehaviour {
             for (int x = 0; x < sizeX; x++)
             {
                 if (tileMap.GetTile(x,y).type == Tile.TYPE.spawn)
-                    return new Vector3(x * tileSize + gameObject.transform.position.x, y * tileSize + gameObject.transform.position.y, gameObject.transform.position.z);
+                    return new Vector3((x + .5f) * tileSize + gameObject.transform.position.x, (y + .5f) * tileSize + gameObject.transform.position.y, gameObject.transform.position.z);
             }
         }
         return new Vector3(100,100,0);
