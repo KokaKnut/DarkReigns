@@ -2,7 +2,7 @@
 using System.Collections;
 
 [System.Serializable]
-public class TileMapPrefabDef
+public struct TileMapPrefabDef
 {
     public TileMap tileMap;
     public bool unique;

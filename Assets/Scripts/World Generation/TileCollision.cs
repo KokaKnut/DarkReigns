@@ -40,6 +40,10 @@ public class TileCollision : MonoBehaviour {
                 Tile[] island = tileMap.Percolate(x, y, solid);
                 if (island.Length > 0)
                 {
+                    for (int i = 0; i < island.Length; i++)
+                    {
+                        island[i].SetCompare('X');
+                    }
                     Array.Sort(island);
                     EdgeCollider2D edge_collider = gameObject.AddComponent<EdgeCollider2D>();
                     edge_collider.hideFlags = HideFlags.HideInInspector;
@@ -48,6 +52,10 @@ public class TileCollision : MonoBehaviour {
                 else
                 {
                     island = tileMap.Percolate(x, y, air);
+                    for (int i = 0; i < island.Length; i++)
+                    {
+                        island[i].SetCompare('X');
+                    }
                     Array.Sort(island);
                     if (!(island[0].x == 0 || island[island.Length - 1].x == tileMap.sizeX - 1))
                     {
