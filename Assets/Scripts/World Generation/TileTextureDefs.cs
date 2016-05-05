@@ -6,7 +6,6 @@ public class TileTypeGraphics
 {
     public Tile.TYPE type = Tile.TYPE.none;
     //TODO: add the abillity for a sprite sheet to have multiple choices for the same tile type, used at the discretion of tile graphics
-    public Texture2D spritesheet = null;
     [Header("Indexes")]
     public int top1 = 0;
     public int top2 = 0;
@@ -30,7 +29,10 @@ public class TileTypeGraphics
     public int bot5 = 0;
 }
 
-public class TileTextureDefs : MonoBehaviour {
+public class TileTextureDefs : MonoBehaviour
+{
 
+    public Texture2D spriteSheet = null;
+    public int tileResolution = 0;
     public TileTypeGraphics[] tileTypes;
 }

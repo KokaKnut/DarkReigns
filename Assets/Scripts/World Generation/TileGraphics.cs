@@ -7,8 +7,6 @@ using System.Collections.Generic;
 [RequireComponent(typeof(MeshRenderer))]
 public class TileGraphics : MonoBehaviour {
     
-    public Texture2D tileTexture;
-    public int tileResolution;
     public TileTextureDefs tileDefs;
     private Dictionary<Tile.TYPE, TileTypeGraphics> tileTypesDefinitions;
 
@@ -17,8 +15,8 @@ public class TileGraphics : MonoBehaviour {
 
     Color[][] ChopUpTiles()
     {
-        int numTilesPerRow = tileTexture.width / tileResolution;
-        int numRows = tileTexture.height / tileResolution;
+        int numTilesPerRow = tileDefs.spriteSheet.width / tileDefs.tileResolution;
+        int numRows = tileDefs.spriteSheet.height / tileDefs.tileResolution;
 
         Color[][] tiles = new Color[numTilesPerRow * numRows][];
 
@@ -26,7 +24,7 @@ public class TileGraphics : MonoBehaviour {
         {
             for (int x = 0; x < numTilesPerRow; x++)
             {
-                tiles[y * numTilesPerRow + x] = tileTexture.GetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution);
+                tiles[y * numTilesPerRow + x] = tileDefs.spriteSheet.GetPixels(x * tileDefs.tileResolution, y * tileDefs.tileResolution, tileDefs.tileResolution, tileDefs.tileResolution);
             }
         }
 
@@ -35,8 +33,8 @@ public class TileGraphics : MonoBehaviour {
 
     public void BuildTexture(TileMap tileMap)
     {
-        int texWidth = sizeX * tileResolution;
-        int texHeight = sizeY * tileResolution;
+        int texWidth = sizeX * tileDefs.tileResolution;
+        int texHeight = sizeY * tileDefs.tileResolution;
         Texture2D texture = new Texture2D(texWidth, texHeight);
 
         Color[][] tiles = ChopUpTiles();
@@ -52,7 +50,7 @@ public class TileGraphics : MonoBehaviour {
             for (int x = 0; x < sizeX; x++)
             {
                 Color[] p = tiles[tileTypesDefinitions[tileMap.GetTile(x, y).type].top1];
-                texture.SetPixels(x * tileResolution, y * tileResolution, tileResolution, tileResolution, p);
+                texture.SetPixels(x * tileDefs.tileResolution, y * tileDefs.tileResolution, tileDefs.tileResolution, tileDefs.tileResolution, p);
             }
         }
 

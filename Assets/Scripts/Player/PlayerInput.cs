@@ -14,11 +14,11 @@ public class PlayerInput : MonoBehaviour {
 
         //Get x-axis input
         float x = 0f;
-        x = Mathf.Round(Mathf.Clamp(Input.GetAxis("Horizontal") * 3, -1, 1));
+        x = (Mathf.Clamp(Input.GetAxis("Horizontal") * 3, -1, 1));
 
         //Get y-axis input
         float y = 0f;
-        y = Mathf.Round(Mathf.Clamp(Input.GetAxis("Vertical") * 3, -1, 1));
+        y = (Mathf.Clamp(Input.GetAxis("Vertical") * 3, -1, 1));
 
         bool jump = (Input.GetAxis("Jump") != 0);
 

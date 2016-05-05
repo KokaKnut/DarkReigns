@@ -22,21 +22,16 @@ public class PlayerController : MonoBehaviour {
 
     void Awake()
     {
-        //transform.position = spawnpos
+        
     }
 
 	// Use this for initialization
 	void Start() {
+        gameObject.transform.position = GameObject.FindGameObjectWithTag("World").GetComponent<TileMapGenerator>().SpawnPos();
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponentInChildren<SpriteRenderer>();
     }
-
-    void LateUpdate()
-    {
-        sprite.transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z);
-    }
-
-
+    
     void FixedUpdate() {
         if (!jumping)
         {

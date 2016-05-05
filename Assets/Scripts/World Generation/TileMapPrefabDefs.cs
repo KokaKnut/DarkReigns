@@ -2,14 +2,16 @@
 using System.Collections;
 
 [System.Serializable]
-public class TileMapPrefabDef
+public struct TileMapPrefabDef
 {
-    TileMap tileMap;
-    bool unique;
-    float rarity;
+    public TileMap tileMap;
+    public bool unique;
+    public float rarity;
+    public Vector2 coords;
 }
 
-public class TileMapPrefabDefs : MonoBehaviour {
+public class TileMapPrefabDefs : MonoBehaviour
+{
 
     public TileMapPrefabDef[] prefabTypes;
 }

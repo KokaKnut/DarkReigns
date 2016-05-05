@@ -3,16 +3,18 @@ using System.Collections;
 using System;
 
 [RequireComponent(typeof(TileMap))]
-public class TileMapPrefabBuilder : MonoBehaviour {
+[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(TileGraphics))]
+public class TileMapPrefabBuilder : MonoBehaviour
+{
     // for removing this object
     public bool killme = false;
 
-	public TileMap tileMap = null;
+    public TileMap tileMap = null;
     public bool preview = false;
     public TileGraphics tg;
     public float tileSize = 0f;
-    public int textureRes = 0;
-    public Texture2D tileTexture = null;
     public Material mat = null;
     public TileTextureDefs tileDefs = null;
 
@@ -21,25 +23,24 @@ public class TileMapPrefabBuilder : MonoBehaviour {
         Disable();
     }
 
-    public Vector2 size
-    {
-        get
-        {
-            return new Vector2(tileMap.sizeX, tileMap.sizeY);
-        }
-        set
-        {
-            tileMap.sizeX = (int)value.x;
-            tileMap.sizeY = (int)value.y;
-        }
-    }
-
-    // for removing this object
+    [ContextMenu("Hide Contents")]
     public void Disable()
     {
-        DestroyImmediate(tg);
-        DestroyImmediate(gameObject.GetComponent<MeshRenderer>());
-        DestroyImmediate(gameObject.GetComponent<MeshFilter>());
+        gameObject.GetComponent<TileGraphics>().enabled = false;
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        enabled = false;
+    }
+
+    [ContextMenu("Show Contents")]
+    public void Enable()
+    {
+        gameObject.GetComponent<TileGraphics>().enabled = true;
+        gameObject.GetComponent<MeshRenderer>().enabled = true;
+        enabled = true;
+    }
+
+    public void Destroy()
+    {
         killme = true;
     }
 }

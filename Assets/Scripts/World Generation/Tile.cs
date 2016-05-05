@@ -1,5 +1,7 @@
-﻿using System;
+﻿using UnityEngine;
+using System;
 
+[System.Serializable]
 public class Tile : IComparable {
 
 	public enum TYPE
@@ -7,12 +9,16 @@ public class Tile : IComparable {
         none,
         ground,
         air,
+        ladder,
         spawn,
         shrine
     }
 
+    [SerializeField]
     private TYPE _type;
+    [SerializeField]
     private int _x;
+    [SerializeField]
     private int _y;
 
     public TYPE type
@@ -68,10 +74,11 @@ public class Tile : IComparable {
     }
 
     //Allow for the IComparable interface to sort on a different axis
-    private delegate int _Comparison(Tile one, Tile other);
+    public delegate int _Comparison(Tile one, Tile other);
+    [SerializeField]
     private _Comparison _CompareDel;
 
-    public int CompareTo(Object other)
+    public int CompareTo(System.Object other)
     {
         return _CompareDel(this, (Tile)other);
     }
@@ -107,5 +114,10 @@ public class Tile : IComparable {
     public override string ToString()
     {
         return type + " at: " + x + ", " + y + ", " + _CompareDel.Method.Name;
+    }
+
+    public string ToUnityString()
+    {
+        return type + " at: " + x + ", " + y;
     }
 }
