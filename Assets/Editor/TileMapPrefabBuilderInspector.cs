@@ -23,11 +23,6 @@ public class TileMapPrefabBuilderInspector : Editor {
     SerializedProperty preview;
     SerializedProperty tg;
 
-    SerializedProperty top;
-    SerializedProperty bot;
-    SerializedProperty left;
-    SerializedProperty right;
-
     void OnEnable()
     {
         ((TileMapPrefabBuilder)target).tileMap = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileMap>();
@@ -37,8 +32,6 @@ public class TileMapPrefabBuilderInspector : Editor {
         preview = serializedObject.FindProperty("preview");
         tg = serializedObject.FindProperty("tg");
         size = ((TileMapPrefabBuilder)target).tileMap.size;
-
-        top = serializedObject.FindProperty("tileMap.top");
         
         ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshFilter>().hideFlags = HideFlags.HideInInspector;
         ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshRenderer>().hideFlags = HideFlags.HideInInspector;

@@ -222,12 +222,12 @@ public class TileMapGenerator : MonoBehaviour {
                     break;
                 case "right":
                     x = (int)startPrefab.coords.x + startPrefab.tileMap.sizeX - 1;
-                    y = (int)startPrefab.coords.y + startPrefab.tileMap.left[index];
+                    y = (int)startPrefab.coords.y + startPrefab.tileMap.right[index];
                     prefab = commons[(int)(random.NextDouble() * commons.Count)];
                     while (prefab.tileMap.leftSize == 0 || prefab.rarity < random.NextDouble())
                         prefab = commons[(int)(random.NextDouble() * commons.Count)];
                     py = prefab.tileMap.left[(int)(random.NextDouble() * prefab.tileMap.leftSize)];
-                    if ((y - py) > 0 && (y + (prefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prefab.tileMap.sizeY) < (tileMap.sizeY - 1))
+                    if ((y - py) > 0 && (y + (prefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prefab.tileMap.sizeX) < (tileMap.sizeX - 1))
                     {
                         bool free = true;
                         for (int i = 0; i < prefab.tileMap.sizeY; i++)
