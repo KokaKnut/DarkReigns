@@ -12,8 +12,32 @@ public class PlayerController : MonoBehaviour {
         shooting,
         dead
     }
-    
-    public STATE state = STATE.idle;
+
+    [SerializeField]
+    private STATE _state = STATE.idle;
+    public STATE state
+    {
+        get
+        {
+            return _state;
+        }
+        set
+        {
+            _state = value;
+            switch (value)
+            {
+                case STATE.idle:
+                    animator.SetInteger("animState", 0);
+                    break;
+                case STATE.walking:
+                    animator.SetInteger("animState", 1);
+                    break;
+                case STATE.jumping:
+                    animator.SetInteger("animState", 2);
+                    break;
+            }
+        }
+    }
     public GameObject rope;
 
     // TWEAK VARS---------------------------
@@ -33,35 +57,23 @@ public class PlayerController : MonoBehaviour {
     
     private bool facingRight = true;
     private SpriteRenderer sprite;
+    private Animator animator;
 
     void Awake()
     {
-        state = STATE.idle;
+        rb = GetComponent<Rigidbody2D>();
+        sprite = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
     }
 
 	// Use this for initialization
 	void Start() {
         gameObject.transform.position = GameObject.FindGameObjectWithTag("World").GetComponent<TileMapGenerator>().SpawnPos();
-        rb = GetComponent<Rigidbody2D>();
-        sprite = GetComponentInChildren<SpriteRenderer>();
     }
     
     void FixedUpdate() {
-        if (state == STATE.roping && rope == null)
-        {
-            state = STATE.jumping;
-        }
-
-        if(state == STATE.jumping && grounded)
-        {
-            state = STATE.walking;
-        }
-
-        if(state == STATE.walking && rb.velocity.x == 0f)
-        {
-            state = STATE.idle;
-        }
-
+        UpdateState();
+        
         if (!jumping)
         {
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTime), -jumpSpeed));
@@ -73,6 +85,62 @@ public class PlayerController : MonoBehaviour {
             {
                 jumpDuration = 0f;
                 jumping = false;
+            }
+        }
+    }
+
+    void UpdateState()
+    {
+        if (state == STATE.roping)
+        {
+            if (rope == null)
+            {
+                state = STATE.jumping;
+            }
+        }
+
+        if (state == STATE.jumping)
+        {
+            if (grounded)
+            {
+                state = STATE.walking;
+            }
+        }
+
+        if (state == STATE.walking)
+        {
+            if (rb.velocity.y != 0f)
+            {
+                state = STATE.jumping;
+            }
+            else
+            {
+                if (rb.velocity.x == 0f)
+                {
+                    state = STATE.idle;
+                }
+            }
+        }
+
+        if (state == STATE.idle)
+        {
+            if (rb.velocity.x != 0f)
+            {
+                if (rb.velocity.y != 0f)
+                {
+                    state = STATE.jumping;
+                }
+                else
+                {
+                    state = STATE.walking;
+                }
+            }
+            else
+            {
+                if (rb.velocity.y != 0f)
+                {
+                    state = STATE.jumping;
+                }
             }
         }
     }
