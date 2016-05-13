@@ -1,22 +1,21 @@
 fileFormatVersion: 2
-guid: 22c293409f8c18e4f82c97cd18c72c13
-timeCreated: 1462995455
+guid: 034bdf7e096f5514cb16281f6ef4fad1
+timeCreated: 1463098343
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: rogue 1_0
-    21300002: rogue 1_1
-    21300004: rogue_0
-    21300006: rogue_1
-    21300008: rogue_2
-    21300010: rogue_3
-    21300012: rogue_4
-    21300014: rogue_5
-    21300016: rogue_6
-    21300018: rogue_7
-    21300020: rogue_8
-    21300022: rogue_9
-    21300024: rogue_10
+    21300000: rogue_0
+    21300002: rogue_1
+    21300004: rogue_2
+    21300006: rogue_3
+    21300008: rogue_4
+    21300010: rogue_5
+    21300012: rogue_6
+    21300014: rogue_7
+    21300016: rogue_8
+    21300018: rogue_9
+    21300020: rogue_10
+    21300022: rogue_11
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -57,7 +56,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 1
+  spritePixelsToUnits: 100
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings: []
@@ -154,7 +153,7 @@ TextureImporter:
     - name: rogue_8
       rect:
         serializedVersion: 2
-        x: 144
+        x: 128
         y: 0
         width: 16
         height: 16
@@ -177,6 +176,17 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 176
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: rogue_11
+      rect:
+        serializedVersion: 2
+        x: 192
         y: 0
         width: 16
         height: 16
