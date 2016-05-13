@@ -3,8 +3,7 @@ using System.Collections;
 using System;
 
 [RequireComponent(typeof(TileMap))]
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(TileGraphics))]
 public class TileMapPrefabBuilder : MonoBehaviour
 {
@@ -15,7 +14,6 @@ public class TileMapPrefabBuilder : MonoBehaviour
     public bool preview = false;
     public TileGraphics tg;
     public float tileSize = 0f;
-    public Material mat = null;
     public TileTextureDefs tileDefs = null;
 
     void Awake()
@@ -27,7 +25,7 @@ public class TileMapPrefabBuilder : MonoBehaviour
     public void Disable()
     {
         gameObject.GetComponent<TileGraphics>().enabled = false;
-        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        gameObject.GetComponent<SpriteRenderer>().enabled = false;
         enabled = false;
     }
 
@@ -35,7 +33,7 @@ public class TileMapPrefabBuilder : MonoBehaviour
     public void Enable()
     {
         gameObject.GetComponent<TileGraphics>().enabled = true;
-        gameObject.GetComponent<MeshRenderer>().enabled = true;
+        gameObject.GetComponent<SpriteRenderer>().enabled = true;
         enabled = true;
     }
 

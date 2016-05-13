@@ -94,7 +94,11 @@ public class TileMapGenerator : MonoBehaviour {
 
         int panic = 0;
         bool done = false;
-        while(!done)
+
+        if (drawn.Count == 0)
+            done = true;
+
+        while (!done)
         {
             //choose random prefab that is currently in the map
             TileMapPrefabDef startPrefab = drawn[(int)(random.NextDouble() * drawn.Count)];

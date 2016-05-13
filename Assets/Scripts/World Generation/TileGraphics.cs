@@ -3,8 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
+//[RequireComponent(typeof(MeshFilter))]
+//[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class TileGraphics : MonoBehaviour {
     
     public TileTextureDefs tileDefs;
@@ -12,32 +13,12 @@ public class TileGraphics : MonoBehaviour {
 
     int sizeX = 0;
     int sizeY = 0;
-
-    Color[][] ChopUpTiles()
-    {
-        int numTilesPerRow = tileDefs.spriteSheet.width / tileDefs.tileResolution;
-        int numRows = tileDefs.spriteSheet.height / tileDefs.tileResolution;
-
-        Color[][] tiles = new Color[numTilesPerRow * numRows][];
-
-        for (int y = 0; y < numRows; y++)
-        {
-            for (int x = 0; x < numTilesPerRow; x++)
-            {
-                tiles[y * numTilesPerRow + x] = tileDefs.spriteSheet.GetPixels(x * tileDefs.tileResolution, y * tileDefs.tileResolution, tileDefs.tileResolution, tileDefs.tileResolution);
-            }
-        }
-
-        return tiles;
-    }
-
+    
     public void BuildTexture(TileMap tileMap)
     {
         int texWidth = sizeX * tileDefs.tileResolution;
         int texHeight = sizeY * tileDefs.tileResolution;
         Texture2D texture = new Texture2D(texWidth, texHeight);
-
-        Color[][] tiles = ChopUpTiles();
 
         tileTypesDefinitions = new Dictionary<Tile.TYPE, TileTypeGraphics>();
         foreach (TileTypeGraphics def in tileDefs.tileTypes)
@@ -49,7 +30,8 @@ public class TileGraphics : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                Color[] p = tiles[tileTypesDefinitions[tileMap.GetTile(x, y).type].top1];
+                Sprite sprite = tileTypesDefinitions[tileMap.GetTile(x, y).type].sprite;
+                Color[] p = sprite.texture.GetPixels((int)(sprite.textureRect.x), (int)(sprite.textureRect.y), tileDefs.tileResolution, tileDefs.tileResolution);
                 texture.SetPixels(x * tileDefs.tileResolution, y * tileDefs.tileResolution, tileDefs.tileResolution, tileDefs.tileResolution, p);
             }
         }
@@ -58,8 +40,13 @@ public class TileGraphics : MonoBehaviour {
         texture.wrapMode = TextureWrapMode.Clamp;
         texture.Apply();
 
-        MeshRenderer mesh_renderer = GetComponent<MeshRenderer>();
-        mesh_renderer.sharedMaterials[0].mainTexture = texture;
+        //MeshRenderer mesh_renderer = GetComponent<MeshRenderer>();
+        //mesh_renderer.material.mainTexture = texture;
+
+        SpriteRenderer sprite_renderer = GetComponent<SpriteRenderer>();
+        //sprite_renderer.sharedMaterial.mainTexture = texture;
+        sprite_renderer.sprite = Sprite.Create(texture, new Rect(transform.position.x, transform.position.y, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
+                                                new Vector2(transform.position.x, transform.position.y), tileDefs.tileResolution / GetComponent<TileMapGenerator>().tileSize);
     }
     
     public void BuildMesh(TileMap tileMap, float tileSize)
@@ -119,8 +106,8 @@ public class TileGraphics : MonoBehaviour {
         mesh.uv = uvs;
 
         //Assign our mesh to the GameObject
-        MeshFilter mesh_filter = GetComponent<MeshFilter>();
-        mesh_filter.mesh = mesh;
+        //MeshFilter mesh_filter = GetComponent<MeshFilter>();
+        //mesh_filter.mesh = mesh;
 
         BuildTexture(tileMap);
     }
