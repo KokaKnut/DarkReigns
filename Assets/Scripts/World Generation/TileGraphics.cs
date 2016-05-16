@@ -3,9 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-//[RequireComponent(typeof(MeshFilter))]
-//[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(SpriteRenderer))]
 public class TileGraphics : MonoBehaviour {
     
     public TileTextureDefs tileDefs;
@@ -14,8 +11,11 @@ public class TileGraphics : MonoBehaviour {
     int sizeX = 0;
     int sizeY = 0;
     
-    public void BuildTexture(TileMap tileMap, float tileSize)
+    public void BuildSprite(TileMap tileMap, float tileSize)
     {
+        sizeX = tileMap.sizeX;
+        sizeY = tileMap.sizeY;
+
         int texWidth = sizeX * tileDefs.tileResolution;
         int texHeight = sizeY * tileDefs.tileResolution;
         Texture2D texture = new Texture2D(texWidth, texHeight);
@@ -40,15 +40,69 @@ public class TileGraphics : MonoBehaviour {
         texture.wrapMode = TextureWrapMode.Clamp;
         texture.Apply();
 
-        //MeshRenderer mesh_renderer = GetComponent<MeshRenderer>();
-        //mesh_renderer.material.mainTexture = texture;
+        AddTextureToSprite(tileSize, texture);
+    }
 
-        SpriteRenderer sprite_renderer = GetComponent<SpriteRenderer>();
-        //sprite_renderer.sharedMaterial.mainTexture = texture;
-        sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
+    private void AddTextureToSprite(float tileSize, Texture2D texture)
+    {
+        const int SPRITE_MAX = 4096;
+
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        while ( sr != null)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(sr);
+            }
+            else
+            {
+                DestroyImmediate(sr);
+            }
+
+            sr = GetComponent<SpriteRenderer>();
+        }
+
+        if (sizeX * tileDefs.tileResolution <= SPRITE_MAX || sizeY * tileDefs.tileResolution <= SPRITE_MAX)
+        {
+            SpriteRenderer sprite_renderer = gameObject.AddComponent<SpriteRenderer>();
+            sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
                                                 new Vector2(0, 0), tileDefs.tileResolution / tileSize);
+        }
+        else
+        {
+            int numX = (sizeX * tileDefs.tileResolution) / SPRITE_MAX + 1;
+            int numY = (sizeY * tileDefs.tileResolution) / SPRITE_MAX + 1;
+
+            
+
+            for(int y = 0; y <= numY; y++)
+            {
+                for(int x = 0; x <= numX; x++)
+                {
+                    int texWidth = SPRITE_MAX;
+                    if (x == numX)
+                        texWidth = (sizeX * tileDefs.tileResolution) % SPRITE_MAX;
+                    int texHeight = SPRITE_MAX;
+                    if (y == numY)
+                        texHeight = (sizeY * tileDefs.tileResolution) % SPRITE_MAX;
+                    Texture2D tempTexture = new Texture2D(texWidth, texHeight);
+
+                    Color[] p = texture.GetPixels(x * SPRITE_MAX, y * SPRITE_MAX, texWidth, texHeight);
+                    tempTexture.SetPixels(0, 0, texWidth, texHeight, p);
+
+                    tempTexture.filterMode = FilterMode.Point;
+                    tempTexture.wrapMode = TextureWrapMode.Clamp;
+                    tempTexture.Apply();
+
+                    SpriteRenderer sprite_renderer = gameObject.AddComponent<SpriteRenderer>();
+                    sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
+                                                        new Vector2(0, 0), tileDefs.tileResolution / tileSize);
+                }
+            }
+        }
     }
     
+    //useless, now using sprites
     public void BuildMesh(TileMap tileMap, float tileSize)
     {
         sizeX = tileMap.sizeX;
@@ -109,7 +163,7 @@ public class TileGraphics : MonoBehaviour {
         //MeshFilter mesh_filter = GetComponent<MeshFilter>();
         //mesh_filter.mesh = mesh;
 
-        BuildTexture(tileMap, tileSize);
+        BuildSprite(tileMap, tileSize);
     }
 
 }

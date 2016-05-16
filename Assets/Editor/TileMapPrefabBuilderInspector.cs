@@ -75,7 +75,7 @@ public class TileMapPrefabBuilderInspector : Editor {
                 //give tilegraphics the tile definitions
                 ((TileGraphics)tg.objectReferenceValue).tileDefs = (TileTextureDefs)tileDefs.objectReferenceValue;
                 //build the mesh
-                ((TileGraphics)tg.objectReferenceValue).BuildMesh((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
+                ((TileGraphics)tg.objectReferenceValue).BuildSprite((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
                 //enable the components for rendering
                 ((TileMapPrefabBuilder)target).Enable();
             }
@@ -93,7 +93,7 @@ public class TileMapPrefabBuilderInspector : Editor {
             GUI.color = Color.white;
             if (GUILayout.Button("Update Preview"))
             {
-                ((TileGraphics)tg.objectReferenceValue).BuildMesh((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
+                ((TileGraphics)tg.objectReferenceValue).BuildSprite((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
             }
             GUILayout.EndHorizontal();
         }
@@ -107,7 +107,7 @@ public class TileMapPrefabBuilderInspector : Editor {
         {
             ((TileMapPrefabBuilder)target).tileMap.SetTile((int)selectorCoord.x, (int)selectorCoord.y, selectorType);
             selectorCoord += selectorSnap;
-            ((TileGraphics)tg.objectReferenceValue).BuildMesh((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
+            ((TileGraphics)tg.objectReferenceValue).BuildSprite((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
         }
         GUI.color = Color.white;
 

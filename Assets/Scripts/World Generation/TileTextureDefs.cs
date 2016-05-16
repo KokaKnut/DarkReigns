@@ -11,8 +11,6 @@ public class TileTypeGraphics
 
 public class TileTextureDefs : MonoBehaviour
 {
-
-    //public Texture2D spriteSheet = null;
     public int tileResolution = 0;
     public TileTypeGraphics[] tileTypes;
 }

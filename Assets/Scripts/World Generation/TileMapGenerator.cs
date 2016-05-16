@@ -35,7 +35,7 @@ public class TileMapGenerator : MonoBehaviour {
         GenerateWorld();
         
         // Now build the mesh with the tile map we made
-        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
+        gameObject.GetComponent<TileGraphics>().BuildSprite(tileMap, tileSize);
 
         // Now build the polycollider with the tile data
         if (collison)
@@ -95,7 +95,7 @@ public class TileMapGenerator : MonoBehaviour {
         int panic = 0;
         bool done = false;
 
-        if (drawn.Count == 0)
+        if (drawn.Count == 0 || commons.Count == 0)
             done = true;
 
         while (!done)
@@ -311,7 +311,7 @@ public class TileMapGenerator : MonoBehaviour {
     [ContextMenu("Draw Textures")]
     public void DrawTextures()
     {
-        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
+        gameObject.GetComponent<TileGraphics>().BuildSprite(tileMap, tileSize);
     }
 
     [ContextMenu("Draw Collision")]
