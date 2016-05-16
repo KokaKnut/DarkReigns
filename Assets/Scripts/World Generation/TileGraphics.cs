@@ -14,7 +14,7 @@ public class TileGraphics : MonoBehaviour {
     int sizeX = 0;
     int sizeY = 0;
     
-    public void BuildTexture(TileMap tileMap)
+    public void BuildTexture(TileMap tileMap, float tileSize)
     {
         int texWidth = sizeX * tileDefs.tileResolution;
         int texHeight = sizeY * tileDefs.tileResolution;
@@ -45,8 +45,8 @@ public class TileGraphics : MonoBehaviour {
 
         SpriteRenderer sprite_renderer = GetComponent<SpriteRenderer>();
         //sprite_renderer.sharedMaterial.mainTexture = texture;
-        sprite_renderer.sprite = Sprite.Create(texture, new Rect(transform.position.x, transform.position.y, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
-                                                new Vector2(transform.position.x, transform.position.y), tileDefs.tileResolution / GetComponent<TileMapGenerator>().tileSize);
+        sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
+                                                new Vector2(0, 0), tileDefs.tileResolution / tileSize);
     }
     
     public void BuildMesh(TileMap tileMap, float tileSize)
@@ -109,7 +109,7 @@ public class TileGraphics : MonoBehaviour {
         //MeshFilter mesh_filter = GetComponent<MeshFilter>();
         //mesh_filter.mesh = mesh;
 
-        BuildTexture(tileMap);
+        BuildTexture(tileMap, tileSize);
     }
 
 }
