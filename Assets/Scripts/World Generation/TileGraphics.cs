@@ -4,13 +4,32 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class TileGraphics : MonoBehaviour {
-    
+
+    const int SPRITE_MAX = 2048;
+
+    public GameObject spriteRendererPrefab;
+
     public TileTextureDefs tileDefs;
     private Dictionary<Tile.TYPE, TileTypeGraphics> tileTypesDefinitions;
 
     int sizeX = 0;
     int sizeY = 0;
-    
+
+    // remove all of the sprite renderers that were already on the gameObject
+    public void RemoveSprites()
+    {
+        if (Application.isEditor)
+            foreach (SpriteRenderer sriteR in GetComponentsInChildren<SpriteRenderer>())
+            {
+                DestroyImmediate(sriteR.gameObject);
+            }
+        else
+            foreach (SpriteRenderer sriteR in GetComponentsInChildren<SpriteRenderer>())
+            {
+                Destroy(sriteR.gameObject);
+            }
+    }
+
     public void BuildSprite(TileMap tileMap, float tileSize)
     {
         sizeX = tileMap.sizeX;
@@ -45,24 +64,9 @@ public class TileGraphics : MonoBehaviour {
 
     private void AddTextureToSprite(float tileSize, Texture2D texture)
     {
-        const int SPRITE_MAX = 4096;
+        RemoveSprites();
 
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        while ( sr != null)
-        {
-            if (Application.isPlaying)
-            {
-                Destroy(sr);
-            }
-            else
-            {
-                DestroyImmediate(sr);
-            }
-
-            sr = GetComponent<SpriteRenderer>();
-        }
-
-        if (sizeX * tileDefs.tileResolution <= SPRITE_MAX || sizeY * tileDefs.tileResolution <= SPRITE_MAX)
+        if (sizeX * tileDefs.tileResolution <= SPRITE_MAX && sizeY * tileDefs.tileResolution <= SPRITE_MAX)
         {
             SpriteRenderer sprite_renderer = gameObject.AddComponent<SpriteRenderer>();
             sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
@@ -75,15 +79,15 @@ public class TileGraphics : MonoBehaviour {
 
             
 
-            for(int y = 0; y <= numY; y++)
+            for(int y = 0; y < numY; y++)
             {
-                for(int x = 0; x <= numX; x++)
+                for(int x = 0; x < numX; x++)
                 {
                     int texWidth = SPRITE_MAX;
-                    if (x == numX)
+                    if (x == numX - 1)
                         texWidth = (sizeX * tileDefs.tileResolution) % SPRITE_MAX;
                     int texHeight = SPRITE_MAX;
-                    if (y == numY)
+                    if (y == numY - 1)
                         texHeight = (sizeY * tileDefs.tileResolution) % SPRITE_MAX;
                     Texture2D tempTexture = new Texture2D(texWidth, texHeight);
 
@@ -94,7 +98,10 @@ public class TileGraphics : MonoBehaviour {
                     tempTexture.wrapMode = TextureWrapMode.Clamp;
                     tempTexture.Apply();
 
-                    SpriteRenderer sprite_renderer = gameObject.AddComponent<SpriteRenderer>();
+                    GameObject child_object = GameObject.Instantiate<GameObject>(spriteRendererPrefab);
+                    child_object.transform.SetParent(transform);
+                    child_object.transform.localPosition = new Vector3((x * SPRITE_MAX) / (tileDefs.tileResolution / tileSize), (y * SPRITE_MAX) / (tileDefs.tileResolution / tileSize), transform.position.z);
+                    SpriteRenderer sprite_renderer = child_object.GetComponent<SpriteRenderer>();
                     sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
                                                         new Vector2(0, 0), tileDefs.tileResolution / tileSize);
                 }
