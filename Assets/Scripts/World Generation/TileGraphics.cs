@@ -102,7 +102,7 @@ public class TileGraphics : MonoBehaviour {
                     child_object.transform.SetParent(transform);
                     child_object.transform.localPosition = new Vector3((x * SPRITE_MAX) / (tileDefs.tileResolution / tileSize), (y * SPRITE_MAX) / (tileDefs.tileResolution / tileSize), transform.position.z);
                     SpriteRenderer sprite_renderer = child_object.GetComponent<SpriteRenderer>();
-                    sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
+                    sprite_renderer.sprite = Sprite.Create(tempTexture, new Rect(0, 0, texWidth, texHeight),
                                                         new Vector2(0, 0), tileDefs.tileResolution / tileSize);
                 }
             }
