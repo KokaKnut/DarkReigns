@@ -190,6 +190,49 @@ public class TileMap : MonoBehaviour {
         return island;
     }
 
+    /// <summary>
+    /// Splits this tilemap into smaller ones of the given size
+    /// </summary>
+    /// <param name="x">length in X direction to split by.</param>
+    /// <param name="y">length in Y direction to split by.</param>
+    /// <returns>Returns an array of the smaller tilmaps.</returns>
+    public TileMap[] Split(int x, int y)
+    {
+        int numberX, numberY;
+        numberX = (sizeX / x) + 1;
+        numberY = (sizeY / y) + 1;
+
+        TileMap[] maps = new TileMap[numberX * numberY];
+        for(int j = 0; j < numberY; j++)
+        {
+            for(int i = 0; i < numberX; i++)
+            {
+                int width = x;
+                if (i == numberX - 1)
+                    width = sizeX % x;
+                int height = y;
+                if (j == numberY - 1)
+                    height = sizeY % y;
+
+                maps[j * numberY + i] = gameObject.AddComponent<TileMap>();
+                maps[j * numberY + i].NewTileMap(width, height);
+
+                int adjX = x * i;
+                int adjY = y * j;
+
+                for (int Y = adjY; Y < adjY + y; Y++)
+                {
+                    for (int X = adjX; X < adjX + x; X++)
+                    {
+                        maps[j * numberY + i].SetTile(X, Y, GetTile(adjX + X, adjY + Y));
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     [ContextMenu("Print Contents")]
     public void PrintContents()
     {

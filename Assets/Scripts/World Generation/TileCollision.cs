@@ -58,14 +58,12 @@ public class TileCollision : MonoBehaviour {
                 }
             }
             x++;
-            if(x >= tileMap.sizeX)
+            if (x >= tileMap.sizeX)
             {
                 x = 0;
                 y++;
             }
         }
-        
-        
     }
 
     Vector2[] GetBox(Tile[] islandY, float tileSize)
