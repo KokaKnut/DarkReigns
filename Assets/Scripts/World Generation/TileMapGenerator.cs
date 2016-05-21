@@ -35,7 +35,7 @@ public class TileMapGenerator : MonoBehaviour {
         GenerateWorld();
         
         // Now build the mesh with the tile map we made
-        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
+        gameObject.GetComponent<TileGraphics>().BuildSprite(tileMap, tileSize);
 
         // Now build the polycollider with the tile data
         if (collison)
@@ -94,7 +94,11 @@ public class TileMapGenerator : MonoBehaviour {
 
         int panic = 0;
         bool done = false;
-        while(!done)
+
+        if (drawn.Count == 0 || commons.Count == 0)
+            done = true;
+
+        while (!done)
         {
             //choose random prefab that is currently in the map
             TileMapPrefabDef startPrefab = drawn[(int)(random.NextDouble() * drawn.Count)];
@@ -222,12 +226,12 @@ public class TileMapGenerator : MonoBehaviour {
                     break;
                 case "right":
                     x = (int)startPrefab.coords.x + startPrefab.tileMap.sizeX - 1;
-                    y = (int)startPrefab.coords.y + startPrefab.tileMap.left[index];
+                    y = (int)startPrefab.coords.y + startPrefab.tileMap.right[index];
                     prefab = commons[(int)(random.NextDouble() * commons.Count)];
                     while (prefab.tileMap.leftSize == 0 || prefab.rarity < random.NextDouble())
                         prefab = commons[(int)(random.NextDouble() * commons.Count)];
                     py = prefab.tileMap.left[(int)(random.NextDouble() * prefab.tileMap.leftSize)];
-                    if ((y - py) > 0 && (y + (prefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prefab.tileMap.sizeY) < (tileMap.sizeY - 1))
+                    if ((y - py) > 0 && (y + (prefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prefab.tileMap.sizeX) < (tileMap.sizeX - 1))
                     {
                         bool free = true;
                         for (int i = 0; i < prefab.tileMap.sizeY; i++)
@@ -307,7 +311,7 @@ public class TileMapGenerator : MonoBehaviour {
     [ContextMenu("Draw Textures")]
     public void DrawTextures()
     {
-        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
+        gameObject.GetComponent<TileGraphics>().BuildSprite(tileMap, tileSize);
     }
 
     [ContextMenu("Draw Collision")]

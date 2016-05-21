@@ -9,7 +9,7 @@ public class PlayerInput : MonoBehaviour {
         player = GetComponent<PlayerController>();
 	}
 	
-    void Update()
+    void FixedUpdate()
     {
 
         //Get x-axis input

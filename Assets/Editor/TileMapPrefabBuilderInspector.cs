@@ -18,37 +18,23 @@ public class TileMapPrefabBuilderInspector : Editor {
     Vector2 newSize;
     //serialized fields
     SerializedProperty tileSize;
-    SerializedProperty mat;
     SerializedProperty tileDefs;
     SerializedProperty preview;
     SerializedProperty tg;
-
-    SerializedProperty top;
-    SerializedProperty bot;
-    SerializedProperty left;
-    SerializedProperty right;
 
     void OnEnable()
     {
         ((TileMapPrefabBuilder)target).tileMap = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileMap>();
         tileSize = serializedObject.FindProperty("tileSize");
-        mat = serializedObject.FindProperty("mat");
         tileDefs = serializedObject.FindProperty("tileDefs");
         preview = serializedObject.FindProperty("preview");
         tg = serializedObject.FindProperty("tg");
         size = ((TileMapPrefabBuilder)target).tileMap.size;
-
-        top = serializedObject.FindProperty("tileMap.top");
         
-        ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshFilter>().hideFlags = HideFlags.HideInInspector;
-        ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshRenderer>().hideFlags = HideFlags.HideInInspector;
+        ((TileMapPrefabBuilder)target).gameObject.GetComponent<SpriteRenderer>().hideFlags = HideFlags.HideInInspector;
         tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
         ((TileGraphics)tg.objectReferenceValue).hideFlags = HideFlags.HideInInspector;
-
-        /*((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshFilter>().hideFlags = HideFlags.None;
-        ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshRenderer>().hideFlags = HideFlags.None;
-        tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
-        ((TileGraphics)tg.objectReferenceValue).hideFlags = HideFlags.None;*/
+        
     }
 
     public override void OnInspectorGUI()
@@ -59,8 +45,7 @@ public class TileMapPrefabBuilderInspector : Editor {
             TileMap TM = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileMap>();
             DestroyImmediate((TileMapPrefabBuilder)target);
             DestroyImmediate(TM.gameObject.GetComponent<TileGraphics>());
-            DestroyImmediate(TM.gameObject.GetComponent<MeshFilter>());
-            DestroyImmediate(TM.gameObject.GetComponent<MeshRenderer>());
+            DestroyImmediate(TM.gameObject.GetComponent<SpriteRenderer>());
             return;
         }
 
@@ -70,7 +55,6 @@ public class TileMapPrefabBuilderInspector : Editor {
         size = newSize;
 
         tileSize.floatValue = EditorGUILayout.FloatField("Preview Tile Size", tileSize.floatValue);
-        mat.objectReferenceValue = (Material)EditorGUILayout.ObjectField("Material", mat.objectReferenceValue, typeof(Material), true);
         tileDefs.objectReferenceValue = (TileTextureDefs)EditorGUILayout.ObjectField("Texture Defs", tileDefs.objectReferenceValue, typeof(TileTextureDefs), true);
 
         if (GUILayout.Button("Build/Reset Tilemap"))
@@ -83,25 +67,17 @@ public class TileMapPrefabBuilderInspector : Editor {
             GUI.color = Color.green;
             if (GUILayout.Button("Show Preview"))
             {
-                if (((TileMapPrefabBuilder)target).mat != null)
-                {
-                    //swap the value for preview
-                    preview.boolValue = !preview.boolValue;
-                    //find the tile graphics component
-                    tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
-                    //set the material for the mesh renderer to the one we have in the inspector
-                    ((TileMapPrefabBuilder)target).gameObject.GetComponent<MeshRenderer>().sharedMaterial = ((TileMapPrefabBuilder)target).mat;
-                    //give tilegraphics the tile definitions
-                    ((TileGraphics)tg.objectReferenceValue).tileDefs = (TileTextureDefs)tileDefs.objectReferenceValue;
-                    //build the mesh
-                    ((TileGraphics)tg.objectReferenceValue).BuildMesh((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
-                    //enable the components for rendering
-                    ((TileMapPrefabBuilder)target).Enable();
-                }
-                else
-                {
-                    Debug.Log("Material is not defined in builder");
-                }
+
+                //swap the value for preview
+                preview.boolValue = !preview.boolValue;
+                //find the tile graphics component
+                tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
+                //give tilegraphics the tile definitions
+                ((TileGraphics)tg.objectReferenceValue).tileDefs = (TileTextureDefs)tileDefs.objectReferenceValue;
+                //build the mesh
+                ((TileGraphics)tg.objectReferenceValue).BuildSprite((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
+                //enable the components for rendering
+                ((TileMapPrefabBuilder)target).Enable();
             }
             GUI.color = Color.white;
         }
@@ -117,7 +93,7 @@ public class TileMapPrefabBuilderInspector : Editor {
             GUI.color = Color.white;
             if (GUILayout.Button("Update Preview"))
             {
-                ((TileGraphics)tg.objectReferenceValue).BuildMesh((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
+                ((TileGraphics)tg.objectReferenceValue).BuildSprite((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
             }
             GUILayout.EndHorizontal();
         }
@@ -131,7 +107,7 @@ public class TileMapPrefabBuilderInspector : Editor {
         {
             ((TileMapPrefabBuilder)target).tileMap.SetTile((int)selectorCoord.x, (int)selectorCoord.y, selectorType);
             selectorCoord += selectorSnap;
-            ((TileGraphics)tg.objectReferenceValue).BuildMesh((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
+            ((TileGraphics)tg.objectReferenceValue).BuildSprite((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
         }
         GUI.color = Color.white;
 

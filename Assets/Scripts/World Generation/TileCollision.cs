@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-//[RequireComponent(typeof(EdgeCollider2D))]
 public class TileCollision : MonoBehaviour {
 
     public Tile.TYPE[] solid;
@@ -38,13 +37,9 @@ public class TileCollision : MonoBehaviour {
             if (!(doneTiles.Contains(tileMap.GetTile(x, y))))
             {
                 Tile[] island = tileMap.Percolate(x, y, solid);
-                if (island.Length > 0)
+
+                if (island.Length > 0) // if island returned empty, our start must be air.
                 {
-                    for (int i = 0; i < island.Length; i++)
-                    {
-                        island[i].SetCompare('X');
-                    }
-                    Array.Sort(island);
                     EdgeCollider2D edge_collider = gameObject.AddComponent<EdgeCollider2D>();
                     edge_collider.hideFlags = HideFlags.HideInInspector;
                     edge_collider.points = GetBox(island, tileSize);
@@ -52,40 +47,23 @@ public class TileCollision : MonoBehaviour {
                 else
                 {
                     island = tileMap.Percolate(x, y, air);
-                    for (int i = 0; i < island.Length; i++)
-                    {
-                        island[i].SetCompare('X');
-                    }
-                    Array.Sort(island);
-                    if (!(island[0].x == 0 || island[island.Length - 1].x == tileMap.sizeX - 1))
-                    {
-                        for (int i = 0; i < island.Length; i++)
-                        {
-                            island[i].SetCompare('Y');
-                        }
-                        Array.Sort(island);
-                        if (!(island[0].y == 0 || island[island.Length - 1].y == tileMap.sizeX - 1))
-                        {
-                            EdgeCollider2D edge_collider = gameObject.AddComponent<EdgeCollider2D>();
-                            edge_collider.hideFlags = HideFlags.HideInInspector;
-                            edge_collider.points = GetBox(island, tileSize);
-                        }
-                    }
+                    EdgeCollider2D edge_collider = gameObject.AddComponent<EdgeCollider2D>();
+                    edge_collider.hideFlags = HideFlags.HideInInspector;
+                    edge_collider.points = GetBox(island, tileSize);
                 }
+
                 foreach (Tile tile in island)
                 {
                     doneTiles.Add(tile);
                 }
             }
             x++;
-            if(x >= tileMap.sizeX)
+            if (x >= tileMap.sizeX)
             {
                 x = 0;
                 y++;
             }
         }
-        
-        
     }
 
     Vector2[] GetBox(Tile[] islandY, float tileSize)

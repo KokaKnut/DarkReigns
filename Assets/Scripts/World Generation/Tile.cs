@@ -9,7 +9,7 @@ public class Tile : IComparable {
         none,
         ground,
         air,
-        ladder,
+        rope,
         spawn,
         shrine
     }

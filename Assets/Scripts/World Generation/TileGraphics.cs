@@ -3,41 +3,41 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
 public class TileGraphics : MonoBehaviour {
-    
+
+    const int SPRITE_MAX = 2048;
+
+    public GameObject spriteRendererPrefab;
+
     public TileTextureDefs tileDefs;
     private Dictionary<Tile.TYPE, TileTypeGraphics> tileTypesDefinitions;
 
     int sizeX = 0;
     int sizeY = 0;
 
-    Color[][] ChopUpTiles()
+    // remove all of the sprite renderers that were already on the gameObject
+    public void RemoveSprites()
     {
-        int numTilesPerRow = tileDefs.spriteSheet.width / tileDefs.tileResolution;
-        int numRows = tileDefs.spriteSheet.height / tileDefs.tileResolution;
-
-        Color[][] tiles = new Color[numTilesPerRow * numRows][];
-
-        for (int y = 0; y < numRows; y++)
-        {
-            for (int x = 0; x < numTilesPerRow; x++)
+        if (Application.isEditor)
+            foreach (SpriteRenderer sriteR in GetComponentsInChildren<SpriteRenderer>())
             {
-                tiles[y * numTilesPerRow + x] = tileDefs.spriteSheet.GetPixels(x * tileDefs.tileResolution, y * tileDefs.tileResolution, tileDefs.tileResolution, tileDefs.tileResolution);
+                DestroyImmediate(sriteR.gameObject);
             }
-        }
-
-        return tiles;
+        else
+            foreach (SpriteRenderer sriteR in GetComponentsInChildren<SpriteRenderer>())
+            {
+                Destroy(sriteR.gameObject);
+            }
     }
 
-    public void BuildTexture(TileMap tileMap)
+    public void BuildSprite(TileMap tileMap, float tileSize)
     {
+        sizeX = tileMap.sizeX;
+        sizeY = tileMap.sizeY;
+
         int texWidth = sizeX * tileDefs.tileResolution;
         int texHeight = sizeY * tileDefs.tileResolution;
         Texture2D texture = new Texture2D(texWidth, texHeight);
-
-        Color[][] tiles = ChopUpTiles();
 
         tileTypesDefinitions = new Dictionary<Tile.TYPE, TileTypeGraphics>();
         foreach (TileTypeGraphics def in tileDefs.tileTypes)
@@ -49,7 +49,8 @@ public class TileGraphics : MonoBehaviour {
         {
             for (int x = 0; x < sizeX; x++)
             {
-                Color[] p = tiles[tileTypesDefinitions[tileMap.GetTile(x, y).type].top1];
+                Sprite sprite = tileTypesDefinitions[tileMap.GetTile(x, y).type].sprite;
+                Color[] p = sprite.texture.GetPixels((int)(sprite.textureRect.x), (int)(sprite.textureRect.y), tileDefs.tileResolution, tileDefs.tileResolution);
                 texture.SetPixels(x * tileDefs.tileResolution, y * tileDefs.tileResolution, tileDefs.tileResolution, tileDefs.tileResolution, p);
             }
         }
@@ -58,10 +59,57 @@ public class TileGraphics : MonoBehaviour {
         texture.wrapMode = TextureWrapMode.Clamp;
         texture.Apply();
 
-        MeshRenderer mesh_renderer = GetComponent<MeshRenderer>();
-        mesh_renderer.sharedMaterials[0].mainTexture = texture;
+        AddTextureToSprite(tileSize, texture);
+    }
+
+    private void AddTextureToSprite(float tileSize, Texture2D texture)
+    {
+        RemoveSprites();
+
+        if (sizeX * tileDefs.tileResolution <= SPRITE_MAX && sizeY * tileDefs.tileResolution <= SPRITE_MAX)
+        {
+            SpriteRenderer sprite_renderer = gameObject.AddComponent<SpriteRenderer>();
+            sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
+                                                new Vector2(0, 0), tileDefs.tileResolution / tileSize);
+        }
+        else
+        {
+            int numX = (sizeX * tileDefs.tileResolution) / SPRITE_MAX + 1;
+            int numY = (sizeY * tileDefs.tileResolution) / SPRITE_MAX + 1;
+
+            
+
+            for(int y = 0; y < numY; y++)
+            {
+                for(int x = 0; x < numX; x++)
+                {
+                    int texWidth = SPRITE_MAX;
+                    if (x == numX - 1)
+                        texWidth = (sizeX * tileDefs.tileResolution) % SPRITE_MAX;
+                    int texHeight = SPRITE_MAX;
+                    if (y == numY - 1)
+                        texHeight = (sizeY * tileDefs.tileResolution) % SPRITE_MAX;
+                    Texture2D tempTexture = new Texture2D(texWidth, texHeight);
+
+                    Color[] p = texture.GetPixels(x * SPRITE_MAX, y * SPRITE_MAX, texWidth, texHeight);
+                    tempTexture.SetPixels(0, 0, texWidth, texHeight, p);
+
+                    tempTexture.filterMode = FilterMode.Point;
+                    tempTexture.wrapMode = TextureWrapMode.Clamp;
+                    tempTexture.Apply();
+
+                    GameObject child_object = GameObject.Instantiate<GameObject>(spriteRendererPrefab);
+                    child_object.transform.SetParent(transform);
+                    child_object.transform.localPosition = new Vector3((x * SPRITE_MAX) / (tileDefs.tileResolution / tileSize), (y * SPRITE_MAX) / (tileDefs.tileResolution / tileSize), transform.position.z);
+                    SpriteRenderer sprite_renderer = child_object.GetComponent<SpriteRenderer>();
+                    sprite_renderer.sprite = Sprite.Create(tempTexture, new Rect(0, 0, texWidth, texHeight),
+                                                        new Vector2(0, 0), tileDefs.tileResolution / tileSize);
+                }
+            }
+        }
     }
     
+    //useless, now using sprites
     public void BuildMesh(TileMap tileMap, float tileSize)
     {
         sizeX = tileMap.sizeX;
@@ -119,10 +167,10 @@ public class TileGraphics : MonoBehaviour {
         mesh.uv = uvs;
 
         //Assign our mesh to the GameObject
-        MeshFilter mesh_filter = GetComponent<MeshFilter>();
-        mesh_filter.mesh = mesh;
+        //MeshFilter mesh_filter = GetComponent<MeshFilter>();
+        //mesh_filter.mesh = mesh;
 
-        BuildTexture(tileMap);
+        BuildSprite(tileMap, tileSize);
     }
 
 }
