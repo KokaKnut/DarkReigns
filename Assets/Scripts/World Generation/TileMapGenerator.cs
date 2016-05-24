@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(TileMap))]
 [RequireComponent(typeof(TileGraphics))]
 [RequireComponent(typeof(TileCollision))]
 public class TileMapGenerator : MonoBehaviour {
@@ -29,7 +28,7 @@ public class TileMapGenerator : MonoBehaviour {
     public void BuildTileMap()
     {
         tileMap = GetComponent<TileMap>();
-        tileMap.NewTileMap(sizeX, sizeY);
+        tileMap = new TileMap(sizeX, sizeY);
 
         // temporary random tiles algorithm
         GenerateWorld();

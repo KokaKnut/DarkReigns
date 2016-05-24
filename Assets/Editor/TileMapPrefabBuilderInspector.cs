@@ -17,6 +17,7 @@ public class TileMapPrefabBuilderInspector : Editor {
     Vector2 size;
     Vector2 newSize;
     //serialized fields
+    SerializedProperty tileMap;
     SerializedProperty tileSize;
     SerializedProperty tileDefs;
     SerializedProperty preview;
@@ -24,7 +25,7 @@ public class TileMapPrefabBuilderInspector : Editor {
 
     void OnEnable()
     {
-        ((TileMapPrefabBuilder)target).tileMap = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileMap>();
+        tileMap = serializedObject.FindProperty("tileMap");
         tileSize = serializedObject.FindProperty("tileSize");
         tileDefs = serializedObject.FindProperty("tileDefs");
         preview = serializedObject.FindProperty("preview");
@@ -39,19 +40,10 @@ public class TileMapPrefabBuilderInspector : Editor {
 
     public override void OnInspectorGUI()
     {
-        // removes the builder safely if marked for destruction
-        if (((TileMapPrefabBuilder)target).killme && Event.current.type == EventType.Repaint)
-        {
-            TileMap TM = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileMap>();
-            DestroyImmediate((TileMapPrefabBuilder)target);
-            DestroyImmediate(TM.gameObject.GetComponent<TileGraphics>());
-            DestroyImmediate(TM.gameObject.GetComponent<SpriteRenderer>());
-            return;
-        }
 
         newSize = EditorGUILayout.Vector2Field("Size of Prefab", ((TileMapPrefabBuilder)target).tileMap.size);
         if (newSize != size)
-            ((TileMapPrefabBuilder)target).tileMap.NewTileMap((int)newSize.x, (int)newSize.y);
+            ((TileMapPrefabBuilder)target).tileMap = new TileMap((int)newSize.x, (int)newSize.y);
         size = newSize;
 
         tileSize.floatValue = EditorGUILayout.FloatField("Preview Tile Size", tileSize.floatValue);
@@ -170,7 +162,7 @@ public class TileMapPrefabBuilderInspector : Editor {
     void GenerateTileMap()
     {
         // temporary random tiles algorithm
-        ((TileMapPrefabBuilder)target).tileMap.NewTileMap(((TileMapPrefabBuilder)target).tileMap.sizeX, ((TileMapPrefabBuilder)target).tileMap.sizeY);
+        ((TileMapPrefabBuilder)target).tileMap = new TileMap(((TileMapPrefabBuilder)target).tileMap.sizeX, ((TileMapPrefabBuilder)target).tileMap.sizeY);
         for (int y = 0; y < ((TileMapPrefabBuilder)target).tileMap.sizeY; y++)
         {
             for (int x = 0; x < ((TileMapPrefabBuilder)target).tileMap.sizeX; x++)

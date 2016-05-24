@@ -2,13 +2,8 @@
 using System.Collections;
 using System;
 
-[RequireComponent(typeof(TileMap))]
-[RequireComponent(typeof(SpriteRenderer))]
-[RequireComponent(typeof(TileGraphics))]
 public class TileMapPrefabBuilder : MonoBehaviour
 {
-    // for removing this object
-    public bool killme = false;
 
     public TileMap tileMap = null;
     public bool preview = false;
@@ -35,10 +30,5 @@ public class TileMapPrefabBuilder : MonoBehaviour
         gameObject.GetComponent<TileGraphics>().enabled = true;
         gameObject.GetComponent<SpriteRenderer>().enabled = true;
         enabled = true;
-    }
-
-    public void Destroy()
-    {
-        killme = true;
     }
 }

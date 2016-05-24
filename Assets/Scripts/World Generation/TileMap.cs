@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 
-public class TileMap : MonoBehaviour {
+[System.Serializable]
+public class TileMap {
 
     [SerializeField]
     private Tile[] tiles;
@@ -42,7 +43,7 @@ public class TileMap : MonoBehaviour {
     public int[] left;
     public int[] right;
 
-    public void NewTileMap(int x, int y)
+    public TileMap(int x, int y)
     {
         _sizeX = x;
         _sizeY = y;
@@ -72,7 +73,7 @@ public class TileMap : MonoBehaviour {
             }
             else
             {
-                print("Tile does not exist: " + x + ", " + y);
+                Debug.Log("Tile does not exist: " + x + ", " + y);
             }
         }
     }
@@ -214,8 +215,8 @@ public class TileMap : MonoBehaviour {
                 if (j == numberY - 1)
                     height = sizeY % y;
 
-                maps[j * numberY + i] = gameObject.AddComponent<TileMap>();
-                maps[j * numberY + i].NewTileMap(width, height);
+                //maps[j * numberY + i] = gameObject.AddComponent<TileMap>();
+                //maps[j * numberY + i].TileMap(width, height);
 
                 int adjX = x * i;
                 int adjY = y * j;
@@ -240,7 +241,7 @@ public class TileMap : MonoBehaviour {
         {
             for (int x = 0; x < _sizeX; x++)
             {
-                print(GetTile(x, y).ToUnityString());
+                Debug.Log(GetTile(x, y).ToUnityString());
             }
         }
     }
