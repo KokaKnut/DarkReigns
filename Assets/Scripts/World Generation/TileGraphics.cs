@@ -19,15 +19,29 @@ public class TileGraphics : MonoBehaviour {
     public void RemoveSprites()
     {
         if (Application.isEditor)
-            foreach (SpriteRenderer sriteR in GetComponentsInChildren<SpriteRenderer>())
+            foreach (SpriteRenderer spriteR in GetComponentsInChildren<SpriteRenderer>())
             {
-                DestroyImmediate(sriteR.gameObject);
+                if(spriteR.gameObject != gameObject)
+                    DestroyImmediate(spriteR.gameObject);
             }
         else
-            foreach (SpriteRenderer sriteR in GetComponentsInChildren<SpriteRenderer>())
+            foreach (SpriteRenderer spriteR in GetComponentsInChildren<SpriteRenderer>())
             {
-                Destroy(sriteR.gameObject);
+                if (spriteR.gameObject != gameObject)
+                    Destroy(spriteR.gameObject);
             }
+    }
+
+    public void SpriteToggle(bool on)
+    {
+        if (on)
+        {
+            gameObject.GetComponent<SpriteRenderer>().enabled = true;
+        }
+        else
+        {
+            gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        }
     }
 
     public void BuildSprite(TileMap tileMap, float tileSize)
@@ -68,7 +82,8 @@ public class TileGraphics : MonoBehaviour {
 
         if (sizeX * tileDefs.tileResolution <= SPRITE_MAX && sizeY * tileDefs.tileResolution <= SPRITE_MAX)
         {
-            SpriteRenderer sprite_renderer = gameObject.AddComponent<SpriteRenderer>();
+            SpriteToggle(true);
+            SpriteRenderer sprite_renderer = gameObject.GetComponent<SpriteRenderer>();
             sprite_renderer.sprite = Sprite.Create(texture, new Rect(0, 0, sizeX * tileDefs.tileResolution, sizeY * tileDefs.tileResolution),
                                                 new Vector2(0, 0), tileDefs.tileResolution / tileSize);
         }
@@ -77,9 +92,9 @@ public class TileGraphics : MonoBehaviour {
             int numX = (sizeX * tileDefs.tileResolution) / SPRITE_MAX + 1;
             int numY = (sizeY * tileDefs.tileResolution) / SPRITE_MAX + 1;
 
-            
+            SpriteToggle(false);
 
-            for(int y = 0; y < numY; y++)
+            for (int y = 0; y < numY; y++)
             {
                 for(int x = 0; x < numX; x++)
                 {

@@ -23,10 +23,23 @@ public class TileCollision : MonoBehaviour {
             }
     }
 
-    public void BuildCollider(TileMap tileMap, float tileSize)
+    public void BuildColliderFast(TileMap tileMap, float tileSize)
+    {
+        TileMap[] maps = tileMap.Split(100, 50);
+
+        RemoveCollision();
+
+        foreach (TileMap map in maps)
+        {
+            BuildCollider(map, tileSize, false);
+        }
+    }
+
+    public void BuildCollider(TileMap tileMap, float tileSize, bool wipeColliders)
     {
         // remove all of the edge colliders that were already on the gameObject
-        RemoveCollision();
+        if(wipeColliders)
+            RemoveCollision();
 
         //run through percolation of all tiles, set collision for all islands
         ArrayList doneTiles = new ArrayList();

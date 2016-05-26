@@ -214,9 +214,8 @@ public class TileMap {
                 int height = y;
                 if (j == numberY - 1)
                     height = sizeY % y;
-
-                //maps[j * numberY + i] = gameObject.AddComponent<TileMap>();
-                //maps[j * numberY + i].TileMap(width, height);
+                
+                maps[j * numberY + i] = new TileMap(width, height);
 
                 int adjX = x * i;
                 int adjY = y * j;

@@ -17,7 +17,7 @@ public class TileMapPrefabBuilderInspector : Editor {
     Vector2 size;
     Vector2 newSize;
     //serialized fields
-    SerializedProperty tileMap;
+    //SerializedProperty tileMap;
     SerializedProperty tileSize;
     SerializedProperty tileDefs;
     SerializedProperty preview;
@@ -25,16 +25,16 @@ public class TileMapPrefabBuilderInspector : Editor {
 
     void OnEnable()
     {
-        tileMap = serializedObject.FindProperty("tileMap");
+        //tileMap = serializedObject.FindProperty("tileMap");
         tileSize = serializedObject.FindProperty("tileSize");
         tileDefs = serializedObject.FindProperty("tileDefs");
         preview = serializedObject.FindProperty("preview");
         tg = serializedObject.FindProperty("tg");
         size = ((TileMapPrefabBuilder)target).tileMap.size;
         
-        ((TileMapPrefabBuilder)target).gameObject.GetComponent<SpriteRenderer>().hideFlags = HideFlags.HideInInspector;
+        //((TileMapPrefabBuilder)target).gameObject.GetComponent<SpriteRenderer>().hideFlags = HideFlags.HideInInspector;
         tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
-        ((TileGraphics)tg.objectReferenceValue).hideFlags = HideFlags.HideInInspector;
+        //((TileGraphics)tg.objectReferenceValue).hideFlags = HideFlags.HideInInspector;
         
     }
 

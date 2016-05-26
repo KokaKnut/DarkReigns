@@ -27,7 +27,6 @@ public class TileMapGenerator : MonoBehaviour {
     
     public void BuildTileMap()
     {
-        tileMap = GetComponent<TileMap>();
         tileMap = new TileMap(sizeX, sizeY);
 
         // temporary random tiles algorithm
@@ -38,7 +37,7 @@ public class TileMapGenerator : MonoBehaviour {
 
         // Now build the polycollider with the tile data
         if (collison)
-            gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
+            gameObject.GetComponent<TileCollision>().BuildColliderFast(tileMap, tileSize);
         else
             gameObject.GetComponent<TileCollision>().RemoveCollision();
     }
@@ -79,11 +78,11 @@ public class TileMapGenerator : MonoBehaviour {
         {
             if (prefab.rarity >= random.NextDouble())
             {
-                for (int y = 0; y < prefab.tileMap.sizeY; y++)
+                for (int y = 0; y < prefab.tileMapPrefab.tileMap.sizeY; y++)
                 {
-                    for (int x = 0; x < prefab.tileMap.sizeX; x++)
+                    for (int x = 0; x < prefab.tileMapPrefab.tileMap.sizeX; x++)
                     {
-                        tileMap.SetTile(x + (int)prefab.coords.x, y + (int)prefab.coords.y, new Tile(x + (int)prefab.coords.x, y + (int)prefab.coords.y, prefab.tileMap.GetTile(x, y).type));
+                        tileMap.SetTile(x + (int)prefab.coords.x, y + (int)prefab.coords.y, new Tile(x + (int)prefab.coords.x, y + (int)prefab.coords.y, prefab.tileMapPrefab.tileMap.GetTile(x, y).type));
                     }
                 }
 
@@ -102,20 +101,20 @@ public class TileMapGenerator : MonoBehaviour {
             //choose random prefab that is currently in the map
             TileMapPrefabDef startPrefab = drawn[(int)(random.NextDouble() * drawn.Count)];
             //choose random opening
-            int index = (int)(random.NextDouble() * (startPrefab.tileMap.topSize + startPrefab.tileMap.botSize + startPrefab.tileMap.leftSize + startPrefab.tileMap.rightSize));
+            int index = (int)(random.NextDouble() * (startPrefab.tileMapPrefab.tileMap.topSize + startPrefab.tileMapPrefab.tileMap.botSize + startPrefab.tileMapPrefab.tileMap.leftSize + startPrefab.tileMapPrefab.tileMap.rightSize));
             string side = "top";
-            if (index >= startPrefab.tileMap.topSize)
+            if (index >= startPrefab.tileMapPrefab.tileMap.topSize)
             {
                 side = "bot";
-                index -= startPrefab.tileMap.topSize;
-                if (index >= startPrefab.tileMap.botSize)
+                index -= startPrefab.tileMapPrefab.tileMap.topSize;
+                if (index >= startPrefab.tileMapPrefab.tileMap.botSize)
                 {
                     side = "left";
-                    index -= startPrefab.tileMap.botSize;
-                    if (index >= startPrefab.tileMap.leftSize)
+                    index -= startPrefab.tileMapPrefab.tileMap.botSize;
+                    if (index >= startPrefab.tileMapPrefab.tileMap.leftSize)
                     {
                         side = "right";
-                        index -= startPrefab.tileMap.leftSize;
+                        index -= startPrefab.tileMapPrefab.tileMap.leftSize;
                     }
                 }
             }
@@ -126,18 +125,18 @@ public class TileMapGenerator : MonoBehaviour {
             switch (side)
             {
                 case "top":
-                    x = (int)startPrefab.coords.x + startPrefab.tileMap.top[index];
-                    y = (int)startPrefab.coords.y + startPrefab.tileMap.sizeY - 1;
+                    x = (int)startPrefab.coords.x + startPrefab.tileMapPrefab.tileMap.top[index];
+                    y = (int)startPrefab.coords.y + startPrefab.tileMapPrefab.tileMap.sizeY - 1;
                     prefab = commons[(int)(random.NextDouble() * commons.Count)];
-                    while (prefab.tileMap.botSize == 0 || prefab.rarity < random.NextDouble())
+                    while (prefab.tileMapPrefab.tileMap.botSize == 0 || prefab.rarity < random.NextDouble())
                         prefab = commons[(int)(random.NextDouble() * commons.Count)];
-                    px = prefab.tileMap.bot[(int)(random.NextDouble() * prefab.tileMap.botSize)];
-                    if ((x - px) > 0 && (x + (prefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y + prefab.tileMap.sizeY) < (tileMap.sizeY - 1))
+                    px = prefab.tileMapPrefab.tileMap.bot[(int)(random.NextDouble() * prefab.tileMapPrefab.tileMap.botSize)];
+                    if ((x - px) > 0 && (x + (prefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y + prefab.tileMapPrefab.tileMap.sizeY) < (tileMap.sizeY - 1))
                     {
                         bool free = true;
-                        for (int i = 0; i < prefab.tileMap.sizeY; i++)
+                        for (int i = 0; i < prefab.tileMapPrefab.tileMap.sizeY; i++)
                         {
-                            for (int j = 0; j < prefab.tileMap.sizeX; j++)
+                            for (int j = 0; j < prefab.tileMapPrefab.tileMap.sizeX; j++)
                             {
                                 if (tileMap.GetTile(x - px + j, y + 1 + i) != null)
                                     free = false;
@@ -145,11 +144,11 @@ public class TileMapGenerator : MonoBehaviour {
                         }
                         if (free)
                         {
-                            for (int i = 0; i < prefab.tileMap.sizeY; i++)
+                            for (int i = 0; i < prefab.tileMapPrefab.tileMap.sizeY; i++)
                             {
-                                for (int j = 0; j < prefab.tileMap.sizeX; j++)
+                                for (int j = 0; j < prefab.tileMapPrefab.tileMap.sizeX; j++)
                                 {
-                                    tileMap.SetTile(x - px + j, y + 1 + i, new Tile(x - px + j, y + 1 + i, prefab.tileMap.GetTile(j, i).type));
+                                    tileMap.SetTile(x - px + j, y + 1 + i, new Tile(x - px + j, y + 1 + i, prefab.tileMapPrefab.tileMap.GetTile(j, i).type));
                                 }
                             }
                             prefab.coords = new Vector2(x - px, y + 1);
@@ -158,19 +157,19 @@ public class TileMapGenerator : MonoBehaviour {
                     }
                     break;
                 case "bot":
-                    x = (int)startPrefab.coords.x + startPrefab.tileMap.bot[index];
+                    x = (int)startPrefab.coords.x + startPrefab.tileMapPrefab.tileMap.bot[index];
                     y = (int)startPrefab.coords.y;
                     prefab = commons[(int)(random.NextDouble() * commons.Count)];
-                    while (prefab.tileMap.topSize == 0 || prefab.rarity < random.NextDouble())
+                    while (prefab.tileMapPrefab.tileMap.topSize == 0 || prefab.rarity < random.NextDouble())
                         prefab = commons[(int)(random.NextDouble() * commons.Count)];
-                    px = prefab.tileMap.top[(int)(random.NextDouble() * prefab.tileMap.topSize)];
-                    py = prefab.tileMap.sizeY;
-                    if ((x - px) > 0 && (x + (prefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y - py) > 0)
+                    px = prefab.tileMapPrefab.tileMap.top[(int)(random.NextDouble() * prefab.tileMapPrefab.tileMap.topSize)];
+                    py = prefab.tileMapPrefab.tileMap.sizeY;
+                    if ((x - px) > 0 && (x + (prefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y - py) > 0)
                     {
                         bool free = true;
-                        for (int i = 0; i < prefab.tileMap.sizeY; i++)
+                        for (int i = 0; i < prefab.tileMapPrefab.tileMap.sizeY; i++)
                         {
-                            for (int j = 0; j < prefab.tileMap.sizeX; j++)
+                            for (int j = 0; j < prefab.tileMapPrefab.tileMap.sizeX; j++)
                             {
                                 if (tileMap.GetTile(x - px + j, y - py + i) != null)
                                     free = false;
@@ -178,11 +177,11 @@ public class TileMapGenerator : MonoBehaviour {
                         }
                         if (free)
                         {
-                            for (int i = 0; i < prefab.tileMap.sizeY; i++)
+                            for (int i = 0; i < prefab.tileMapPrefab.tileMap.sizeY; i++)
                             {
-                                for (int j = 0; j < prefab.tileMap.sizeX; j++)
+                                for (int j = 0; j < prefab.tileMapPrefab.tileMap.sizeX; j++)
                                 {
-                                    tileMap.SetTile(x - px + j, y - py + i, new Tile(x - px + j, y - py + i, prefab.tileMap.GetTile(j, i).type));
+                                    tileMap.SetTile(x - px + j, y - py + i, new Tile(x - px + j, y - py + i, prefab.tileMapPrefab.tileMap.GetTile(j, i).type));
                                 }
                             }
                             prefab.coords = new Vector2(x - px, y - py);
@@ -192,18 +191,18 @@ public class TileMapGenerator : MonoBehaviour {
                     break;
                 case "left":
                     x = (int)startPrefab.coords.x;
-                    y = (int)startPrefab.coords.y + startPrefab.tileMap.left[index];
+                    y = (int)startPrefab.coords.y + startPrefab.tileMapPrefab.tileMap.left[index];
                     prefab = commons[(int)(random.NextDouble() * commons.Count)];
-                    while (prefab.tileMap.rightSize == 0 || prefab.rarity < random.NextDouble())
+                    while (prefab.tileMapPrefab.tileMap.rightSize == 0 || prefab.rarity < random.NextDouble())
                         prefab = commons[(int)(random.NextDouble() * commons.Count)];
-                    px = prefab.tileMap.sizeX;
-                    py = prefab.tileMap.right[(int)(random.NextDouble() * prefab.tileMap.rightSize)];
-                    if((y - py) > 0 && (y + (prefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x - px) > 0)
+                    px = prefab.tileMapPrefab.tileMap.sizeX;
+                    py = prefab.tileMapPrefab.tileMap.right[(int)(random.NextDouble() * prefab.tileMapPrefab.tileMap.rightSize)];
+                    if((y - py) > 0 && (y + (prefab.tileMapPrefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x - px) > 0)
                     {
                         bool free = true;
-                        for (int i = 0; i < prefab.tileMap.sizeY; i++)
+                        for (int i = 0; i < prefab.tileMapPrefab.tileMap.sizeY; i++)
                         {
-                            for (int j = 0; j < prefab.tileMap.sizeX; j++)
+                            for (int j = 0; j < prefab.tileMapPrefab.tileMap.sizeX; j++)
                             {
                                 if (tileMap.GetTile(x - px + j, y - py + i) != null)
                                     free = false;
@@ -211,11 +210,11 @@ public class TileMapGenerator : MonoBehaviour {
                         }
                         if (free)
                         {
-                            for (int i = 0; i < prefab.tileMap.sizeY; i++)
+                            for (int i = 0; i < prefab.tileMapPrefab.tileMap.sizeY; i++)
                             {
-                                for (int j = 0; j < prefab.tileMap.sizeX; j++)
+                                for (int j = 0; j < prefab.tileMapPrefab.tileMap.sizeX; j++)
                                 {
-                                    tileMap.SetTile(x - px + j, y - py + i, new Tile(x - px + j, y - py + i, prefab.tileMap.GetTile(j, i).type));
+                                    tileMap.SetTile(x - px + j, y - py + i, new Tile(x - px + j, y - py + i, prefab.tileMapPrefab.tileMap.GetTile(j, i).type));
                                 }
                             }
                             prefab.coords = new Vector2(x - px, y - py);
@@ -224,18 +223,18 @@ public class TileMapGenerator : MonoBehaviour {
                     }
                     break;
                 case "right":
-                    x = (int)startPrefab.coords.x + startPrefab.tileMap.sizeX - 1;
-                    y = (int)startPrefab.coords.y + startPrefab.tileMap.right[index];
+                    x = (int)startPrefab.coords.x + startPrefab.tileMapPrefab.tileMap.sizeX - 1;
+                    y = (int)startPrefab.coords.y + startPrefab.tileMapPrefab.tileMap.right[index];
                     prefab = commons[(int)(random.NextDouble() * commons.Count)];
-                    while (prefab.tileMap.leftSize == 0 || prefab.rarity < random.NextDouble())
+                    while (prefab.tileMapPrefab.tileMap.leftSize == 0 || prefab.rarity < random.NextDouble())
                         prefab = commons[(int)(random.NextDouble() * commons.Count)];
-                    py = prefab.tileMap.left[(int)(random.NextDouble() * prefab.tileMap.leftSize)];
-                    if ((y - py) > 0 && (y + (prefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prefab.tileMap.sizeX) < (tileMap.sizeX - 1))
+                    py = prefab.tileMapPrefab.tileMap.left[(int)(random.NextDouble() * prefab.tileMapPrefab.tileMap.leftSize)];
+                    if ((y - py) > 0 && (y + (prefab.tileMapPrefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prefab.tileMapPrefab.tileMap.sizeX) < (tileMap.sizeX - 1))
                     {
                         bool free = true;
-                        for (int i = 0; i < prefab.tileMap.sizeY; i++)
+                        for (int i = 0; i < prefab.tileMapPrefab.tileMap.sizeY; i++)
                         {
-                            for (int j = 0; j < prefab.tileMap.sizeX; j++)
+                            for (int j = 0; j < prefab.tileMapPrefab.tileMap.sizeX; j++)
                             {
                                 if (tileMap.GetTile(x + 1 + j, y - py + i) != null)
                                     free = false;
@@ -243,11 +242,11 @@ public class TileMapGenerator : MonoBehaviour {
                         }
                         if(free)
                         {
-                            for (int i = 0; i < prefab.tileMap.sizeY; i++)
+                            for (int i = 0; i < prefab.tileMapPrefab.tileMap.sizeY; i++)
                             {
-                                for (int j = 0; j < prefab.tileMap.sizeX; j++)
+                                for (int j = 0; j < prefab.tileMapPrefab.tileMap.sizeX; j++)
                                 {
-                                    tileMap.SetTile(x  + 1 + j, y - py + i, new Tile(x + 1 + j, y - py + i, prefab.tileMap.GetTile(j, i).type));
+                                    tileMap.SetTile(x  + 1 + j, y - py + i, new Tile(x + 1 + j, y - py + i, prefab.tileMapPrefab.tileMap.GetTile(j, i).type));
                                 }
                             }
                             prefab.coords = new Vector2(x  + 1, y - py);
@@ -316,7 +315,7 @@ public class TileMapGenerator : MonoBehaviour {
     [ContextMenu("Draw Collision")]
     public void DrawCollision()
     {
-        gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize);
+        gameObject.GetComponent<TileCollision>().BuildCollider(tileMap, tileSize, true);
     }
 
     public Vector3 SpawnPos()
