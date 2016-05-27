@@ -25,7 +25,7 @@ public class TileCollision : MonoBehaviour {
 
     public void BuildColliderFast(TileMap tileMap, float tileSize)
     {
-        TileMap[] maps = tileMap.Split(100, 50);
+        TileMap[] maps = tileMap.Split(5, 5);
 
         RemoveCollision();
 
@@ -60,9 +60,9 @@ public class TileCollision : MonoBehaviour {
                 else
                 {
                     island = tileMap.Percolate(x, y, air);
-                    EdgeCollider2D edge_collider = gameObject.AddComponent<EdgeCollider2D>();
-                    edge_collider.hideFlags = HideFlags.HideInInspector;
-                    edge_collider.points = GetBox(island, tileSize);
+                    //EdgeCollider2D edge_collider = gameObject.AddComponent<EdgeCollider2D>();
+                    //edge_collider.hideFlags = HideFlags.HideInInspector;
+                    //edge_collider.points = GetBox(island, tileSize);
                 }
 
                 foreach (Tile tile in island)

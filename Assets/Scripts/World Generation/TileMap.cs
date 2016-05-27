@@ -47,7 +47,7 @@ public class TileMap {
     {
         _sizeX = x;
         _sizeY = y;
-        tiles = new Tile[x + y * _sizeX];
+        tiles = new Tile[x * y];
     }
 
     public Tile GetTile(int x, int y)
@@ -164,7 +164,7 @@ public class TileMap {
     /// <returns>Returns an unsorted array of the tiles that percolated.</returns>
     public Tile[] Percolate(int x, int y, Tile.TYPE[] percType)
     {
-        if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY && percType != null)
+        if (x >= tiles[0].x && x < tiles[0].x + _sizeX && y >= tiles[0].y && y < tiles[0].y + _sizeY && percType != null)
         {
             List<Tile> island = new List<Tile>();
             return _Percolate(x, y, island, percType).ToArray();
@@ -224,13 +224,13 @@ public class TileMap {
                 {
                     for (int X = adjX; X < adjX + x; X++)
                     {
-                        maps[j * numberY + i].SetTile(X, Y, GetTile(adjX + X, adjY + Y));
+                        maps[j * numberY + i].SetTile(X - adjX, Y - adjY, GetTile(X, Y));
                     }
                 }
             }
         }
 
-        return null;
+        return maps;
     }
 
     [ContextMenu("Print Contents")]
