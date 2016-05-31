@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
 
     public enum STATE
     {
@@ -41,20 +42,25 @@ public class PlayerController : MonoBehaviour {
     public GameObject rope;
 
     // TWEAK VARS---------------------------
+    [Header("TWEAK VARS")]
     private Rigidbody2D rb;
     public float runSpeed = 1f;
     public float jumpSpeed = 1f;
     public float jumpTime = .3f;
-    public float hangTime = .2f;
-    public int jumpCount = 1;
-    
+    public float hangTimeUp = .2f;
+    public float hangTimeDown = .2f;
+    public int numberOfJumps = 1;
+
     // JUMP STUFF---------------------------
+    [Header("VISIBLE VARS")]
     public bool grounded = false;
     public bool cielinged = false;
-    private bool jumping = false;
-    private float jumpClock = 0f;
-    private float jumpDuration = 0f;
-    
+    public bool jumpReleased = true;
+    public bool jumping = false;
+    public float jumpClock = 0f;
+    public float jumpDuration = 0f;
+    public int jumpCount = 0;
+
     private bool facingRight = true;
     private SpriteRenderer sprite;
     private Animator animator;
@@ -66,27 +72,10 @@ public class PlayerController : MonoBehaviour {
         animator = GetComponentInChildren<Animator>();
     }
 
-	// Use this for initialization
-	void Start() {
+    // Use this for initialization
+    void Start()
+    {
         gameObject.transform.position = GameObject.FindGameObjectWithTag("World").GetComponent<TileMapGenerator>().SpawnPos();
-    }
-    
-    void FixedUpdate() {
-        UpdateState();
-        
-        if (!jumping)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTime), -jumpSpeed));
-            jumpDuration = 0f;
-        }
-        else
-        {
-            if (jumpDuration > jumpTime || cielinged)
-            {
-                jumpDuration = 0f;
-                jumping = false;
-            }
-        }
     }
 
     void UpdateState()
@@ -145,33 +134,63 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    void FixedUpdate()
+    {
+        UpdateState();
+
+        if (!jumping)
+        {
+            if (rb.velocity.y > 0)
+                rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeUp), -jumpSpeed));
+            else
+                rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeDown * (1 - (1 - (jumpDuration / jumpTime)) / 2)), -jumpSpeed));
+        }
+        else
+        {
+            if (jumpDuration > jumpTime || cielinged)
+            {
+                jumping = false;
+            }
+        }
+
+        if (grounded)
+        {
+            jumpCount = 0;
+        }
+    }
+
     public void Move(float x, float y, bool jump)
     {
         if (state != STATE.roping)
         {
             rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
 
-            if (jump && grounded)
+            if (!jump)
+            {
+                jumpReleased = true;
+                jumping = false;
+            }
+
+            if (jump && (grounded || (numberOfJumps > jumpCount && jumpReleased)))
             {
                 jumping = true;
+                jumpReleased = false;
+                jumpCount++;
                 jumpClock = Time.fixedTime;
+                jumpDuration = 0f;
                 rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
             }
             if (jump && jumping)
             {
-                jumpDuration += Time.fixedTime - jumpClock;
-                jumpClock = Time.fixedTime;
-            }
-            if (!jump)
-            {
-                jumping = false;
+                if (jumpDuration < jumpTime)
+                    jumpDuration = Time.fixedTime - jumpClock;
             }
         }
         else
         {
             rb.velocity = new Vector2(rb.velocity.x, runSpeed * y);
         }
-        
+
         // If the input is moving the player right and the player is facing left...
         if (x > 0 && !facingRight)
         {

@@ -6,6 +6,7 @@ public class FollowCam : MonoBehaviour {
     public Transform target;
     public float lerpSpeed;
     public int zoom;
+    public bool pixelFix;
 	
 	// Update is called once per frame
 	void LateUpdate () {
@@ -13,6 +14,7 @@ public class FollowCam : MonoBehaviour {
         GetComponent<Camera>().orthographicSize = Screen.height / (2 * zoom);
 
         // Pixel fix
-        transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z);
+        if (pixelFix)
+            transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z);
     }
 }
