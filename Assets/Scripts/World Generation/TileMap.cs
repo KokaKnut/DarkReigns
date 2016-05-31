@@ -164,7 +164,7 @@ public class TileMap {
     /// <returns>Returns an unsorted array of the tiles that percolated.</returns>
     public Tile[] Percolate(int x, int y, Tile.TYPE[] percType)
     {
-        if (x >= tiles[0].x && x < tiles[0].x + _sizeX && y >= tiles[0].y && y < tiles[0].y + _sizeY && percType != null)
+        if (x >= 0 && x < _sizeX && y >= 0 && y < _sizeY && percType != null)
         {
             List<Tile> island = new List<Tile>();
             return _Percolate(x, y, island, percType).ToArray();
@@ -200,8 +200,8 @@ public class TileMap {
     public TileMap[] Split(int x, int y)
     {
         int numberX, numberY;
-        numberX = (sizeX / x) + 1;
-        numberY = (sizeY / y) + 1;
+        numberX = (sizeX / x) + (1 * sizeX % x) % 1;
+        numberY = (sizeY / y) + (1 * sizeY % y) % 1;
 
         TileMap[] maps = new TileMap[numberX * numberY];
         for(int j = 0; j < numberY; j++)
@@ -209,13 +209,13 @@ public class TileMap {
             for(int i = 0; i < numberX; i++)
             {
                 int width = x;
-                if (i == numberX - 1)
+                if (i == numberX - 1 && sizeX % x != 0)
                     width = sizeX % x;
                 int height = y;
-                if (j == numberY - 1)
+                if (j == numberY - 1 && sizeY % y != 0)
                     height = sizeY % y;
                 
-                maps[j * numberY + i] = new TileMap(width, height);
+                maps[j * numberX + i] = new TileMap(width, height);
 
                 int adjX = x * i;
                 int adjY = y * j;
@@ -224,7 +224,7 @@ public class TileMap {
                 {
                     for (int X = adjX; X < adjX + x; X++)
                     {
-                        maps[j * numberY + i].SetTile(X - adjX, Y - adjY, GetTile(X, Y));
+                        maps[j * numberX + i].SetTile(X - adjX, Y - adjY, GetTile(X, Y));
                     }
                 }
             }
