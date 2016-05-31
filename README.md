@@ -1,8 +1,9 @@
 # DarkReigns
 A 2D platforming game created in Unity
 
+Check Wiki for links!
 
-Dark Reigns Idea/ToDo List
+Dark Reigns Idea List
 
 Idea:Platformer Game that revolves around collecting weapons/items and using boss fights to create even better items
 
