@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class TileGraphics : MonoBehaviour {
 
-    const int SPRITE_MAX = 2048;
+    const int SPRITE_MAX = 2048; //2048
 
     public GameObject spriteRendererPrefab;
 
@@ -104,21 +104,13 @@ public class TileGraphics : MonoBehaviour {
                     int texHeight = SPRITE_MAX;
                     if (y == numY - 1)
                         texHeight = (sizeY * tileDefs.tileResolution) % SPRITE_MAX;
-                    Texture2D tempTexture = new Texture2D(texWidth, texHeight);
-
-                    Color[] p = texture.GetPixels(x * SPRITE_MAX, y * SPRITE_MAX, texWidth, texHeight);
-                    tempTexture.SetPixels(0, 0, texWidth, texHeight, p);
-
-                    tempTexture.filterMode = FilterMode.Point;
-                    tempTexture.wrapMode = TextureWrapMode.Clamp;
-                    tempTexture.Apply();
 
                     GameObject child_object = GameObject.Instantiate<GameObject>(spriteRendererPrefab);
                     child_object.transform.SetParent(transform);
                     child_object.transform.localPosition = new Vector3((x * SPRITE_MAX) / (tileDefs.tileResolution / tileSize), (y * SPRITE_MAX) / (tileDefs.tileResolution / tileSize), transform.position.z);
                     SpriteRenderer sprite_renderer = child_object.GetComponent<SpriteRenderer>();
-                    sprite_renderer.sprite = Sprite.Create(tempTexture, new Rect(0, 0, texWidth, texHeight),
-                                                        new Vector2(0, 0), tileDefs.tileResolution / tileSize);
+                    sprite_renderer.sprite = Sprite.Create(texture, new Rect(x * SPRITE_MAX, y * SPRITE_MAX, texWidth, texHeight),
+                                                        new Vector2(0, 0), tileDefs.tileResolution / tileSize, 0, SpriteMeshType.FullRect);
                 }
             }
         }

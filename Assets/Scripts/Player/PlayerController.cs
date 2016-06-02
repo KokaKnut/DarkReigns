@@ -46,9 +46,12 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     public float runSpeed = 1f;
     public float jumpSpeed = 1f;
+    public float fallingSpeed = 1f;
     public float jumpTime = .3f;
+    public float jumpDurationSlowdown = 20f;
     public float hangTimeUp = .2f;
     public float hangTimeDown = .2f;
+    public float hangTimeDownTimeFactor = .2f;
     public int numberOfJumps = 1;
 
     // JUMP STUFF---------------------------
@@ -143,7 +146,7 @@ public class PlayerController : MonoBehaviour
             if (rb.velocity.y > 0)
                 rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeUp), -jumpSpeed));
             else
-                rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeDown * (1 - (1 - (jumpDuration / jumpTime)) / 2)), -jumpSpeed));
+                rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeDown * ((jumpDuration + jumpTime) / (jumpTime + hangTimeDownTimeFactor))), -fallingSpeed));
         }
         else
         {
@@ -156,6 +159,7 @@ public class PlayerController : MonoBehaviour
         if (grounded)
         {
             jumpCount = 0;
+            jumpDuration = jumpTime;
         }
     }
 
@@ -171,7 +175,7 @@ public class PlayerController : MonoBehaviour
                 jumping = false;
             }
 
-            if (jump && (grounded || (numberOfJumps > jumpCount && jumpReleased)))
+            if (jump && jumpReleased && (grounded || numberOfJumps > jumpCount))
             {
                 jumping = true;
                 jumpReleased = false;
@@ -182,8 +186,8 @@ public class PlayerController : MonoBehaviour
             }
             if (jump && jumping)
             {
-                if (jumpDuration < jumpTime)
-                    jumpDuration = Time.fixedTime - jumpClock;
+                jumpDuration = Time.fixedTime - jumpClock;
+                rb.velocity = new Vector2(rb.velocity.x, jumpSpeed - (jumpDuration * jumpDurationSlowdown));
             }
         }
         else

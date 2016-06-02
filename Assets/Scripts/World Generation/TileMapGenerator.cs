@@ -24,7 +24,7 @@ public class TileMapGenerator : MonoBehaviour {
 	void Awake () {
         BuildTileMap();
 	}
-    
+
     public void BuildTileMap()
     {
         tileMap = new TileMap(sizeX, sizeY);
