@@ -39,11 +39,9 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    public GameObject rope;
 
     // TWEAK VARS---------------------------
     [Header("TWEAK VARS")]
-    private Rigidbody2D rb;
     public float runSpeed = 1f;
     public float jumpSpeed = 1f;
     public float fallingSpeed = 1f;
@@ -63,10 +61,13 @@ public class PlayerController : MonoBehaviour
     public float jumpClock = 0f;
     public float jumpDuration = 0f;
     public int jumpCount = 0;
+    
+    public GameObject rope;
 
     private bool facingRight = true;
     private SpriteRenderer sprite;
     private Animator animator;
+    private Rigidbody2D rb;
 
     void Awake()
     {
