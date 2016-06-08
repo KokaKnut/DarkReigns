@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class TileCollision : MonoBehaviour {
 
+    public int splitX;
+    public int splitY;
     public Tile.TYPE[] solid;
     public Tile.TYPE[] air;
 
@@ -25,7 +27,7 @@ public class TileCollision : MonoBehaviour {
 
     public void BuildColliderFast(TileMap tileMap, float tileSize)
     {
-        TileMap[] maps = tileMap.Split(5, 5);
+        TileMap[] maps = tileMap.Split(splitX, splitY);
 
         RemoveCollision();
 

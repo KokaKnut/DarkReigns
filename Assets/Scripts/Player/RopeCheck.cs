@@ -2,28 +2,16 @@
 using System.Collections;
 
 public class RopeCheck : MonoBehaviour {
-    private PlayerController player;
 
-    void Start()
+    void OnTriggerEnter2D(Collider2D other)
     {
-        player = gameObject.GetComponentInParent<PlayerController>();
+        if (other.gameObject.CompareTag("Player"))
+            other.gameObject.GetComponent<PlayerController>().rope = gameObject;
     }
 
-    void OnTriggerEnter2D(Collider2D collider)
+    void OnTriggerExit2D(Collider2D other)
     {
-        if (collider.gameObject.CompareTag("player"))
-            player.rope = gameObject;
-    }
-
-    void OnTriggerStay2D(Collider2D collider)
-    {
-        if (collider.gameObject.CompareTag("player"))
-            player.rope = collider.gameObject;
-    }
-
-    void OnTriggerExit2D(Collider2D collider)
-    {
-        if (collider.gameObject.CompareTag("player"))
-            player.rope = null;
+        if (other.gameObject.CompareTag("Player"))
+            other.gameObject.GetComponent<PlayerController>().rope = null;
     }
 }

@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour
     {
         if (state == STATE.roping)
         {
-            if (rope == null)
+            if (rope == null || jumping)
             {
                 state = STATE.jumping;
             }
@@ -142,22 +142,30 @@ public class PlayerController : MonoBehaviour
     {
         UpdateState();
 
-        if (!jumping)
+        if (state != STATE.roping)
         {
-            if (rb.velocity.y > 0)
-                rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeUp), -jumpSpeed));
-            else
-                rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeDown * ((jumpDuration + jumpTime) / (jumpTime + hangTimeDownTimeFactor))), -fallingSpeed));
-        }
-        else
-        {
-            if (jumpDuration > jumpTime || cielinged)
+            if (!jumping)
             {
-                jumping = false;
+                if (rb.velocity.y > 0)
+                    rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeUp), -jumpSpeed));
+                else
+                    rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y - (jumpSpeed * hangTimeDown * ((jumpDuration + jumpTime) / (jumpTime + hangTimeDownTimeFactor))), -fallingSpeed));
+            }
+            else
+            {
+                if (jumpDuration > jumpTime || cielinged)
+                {
+                    jumping = false;
+                }
+            }
+
+            if (grounded || state != STATE.jumping)
+            {
+                jumpCount = 0;
+                jumpDuration = jumpTime;
             }
         }
-
-        if (grounded)
+        else
         {
             jumpCount = 0;
             jumpDuration = jumpTime;
@@ -166,46 +174,58 @@ public class PlayerController : MonoBehaviour
 
     public void Move(float x, float y, bool jump)
     {
-        if (state != STATE.roping)
+        //checking if we should grab a rope
+        if (state != STATE.roping && y > .7f && rope != null)
         {
-            rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
-
-            if (!jump)
-            {
-                jumpReleased = true;
-                jumping = false;
-            }
-
-            if (jump && jumpReleased && (grounded || numberOfJumps > jumpCount))
-            {
-                jumping = true;
-                jumpReleased = false;
-                jumpCount++;
-                jumpClock = Time.fixedTime;
-                jumpDuration = 0f;
-                rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
-            }
-            if (jump && jumping)
-            {
-                jumpDuration = Time.fixedTime - jumpClock;
-                rb.velocity = new Vector2(rb.velocity.x, jumpSpeed - (jumpDuration * jumpDurationSlowdown));
-            }
+            state = STATE.roping;
+            transform.position = new Vector3(rope.transform.position.x, transform.position.y, 0);
         }
-        else
+        
+        //setting up an initial speed
+        rb.velocity = new Vector2(runSpeed * x, rb.velocity.y);
+
+        //when the player has released the jump button for the first time in their jump
+        if (!jump && jumpReleased == false)
         {
-            rb.velocity = new Vector2(rb.velocity.x, runSpeed * y);
+            jumpReleased = true;
+            jumping = false;
+            jumpCount++;
+
+            //stops weird math from too short of jumps
+            if (jumpDuration < jumpTime / 4)
+                jumpDuration = jumpTime / 4;
         }
 
-        // If the input is moving the player right and the player is facing left...
+        //check if the player can jump and is trying to jump
+        if (jump && jumpReleased && (grounded || numberOfJumps > jumpCount))
+        {
+            jumping = true;
+            jumpReleased = false;
+            jumpClock = Time.fixedTime;
+            jumpDuration = 0f;
+            rb.velocity = new Vector2(rb.velocity.x, jumpSpeed);
+        }
+        //check if the player is in the middle of a jump
+        if (jump && jumping)
+        {
+            jumpDuration = Time.fixedTime - jumpClock;
+            rb.velocity = new Vector2(rb.velocity.x, jumpSpeed - (jumpDuration * jumpDurationSlowdown));
+        }
+
+        //if the player is roping, don't let him move sideways
+        if (state == STATE.roping)
+        {
+            rb.velocity = new Vector2(0, runSpeed * y);
+        }
+
+        // If the input is moving the player right and the player is facing left
         if (x > 0 && !facingRight)
         {
-            // ... flip the player.
             Flip();
         }
-        // Otherwise if the input is moving the player left and the player is facing right...
+        // Otherwise if the input is moving the player left and the player is facing right
         else if (x < 0 && facingRight)
         {
-            // ... flip the player.
             Flip();
         }
     }
