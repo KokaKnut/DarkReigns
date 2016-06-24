@@ -200,8 +200,8 @@ public class TileMap {
     public TileMap[] Split(int x, int y)
     {
         int numberX, numberY;
-        numberX = (sizeX / x) + (1 * sizeX % x) % 1;
-        numberY = (sizeY / y) + (1 * sizeY % y) % 1;
+        numberX = (sizeX / x) + Mathf.Clamp(sizeX % x, 0, 1);
+        numberY = (sizeY / y) + Mathf.Clamp(sizeY % y, 0, 1);
 
         TileMap[] maps = new TileMap[numberX * numberY];
         for(int j = 0; j < numberY; j++)

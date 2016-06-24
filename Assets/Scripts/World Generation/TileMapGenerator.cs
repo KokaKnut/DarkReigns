@@ -33,7 +33,7 @@ public class TileMapGenerator : MonoBehaviour {
         GenerateWorld();
         
         // Now build the mesh with the tile map we made
-        gameObject.GetComponent<TileGraphics>().BuildSprite(tileMap, tileSize);
+        gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
 
         // Now build the polycollider with the tile data
         if (collison)

@@ -37,10 +37,10 @@ public class TileCollision : MonoBehaviour {
         }
     }
 
-    public void BuildCollider(TileMap tileMap, float tileSize, bool wipeColliders)
+    public void BuildCollider(TileMap tileMap, float tileSize, bool bRemoveColliders)
     {
         // remove all of the edge colliders that were already on the gameObject
-        if(wipeColliders)
+        if(bRemoveColliders)
             RemoveCollision();
 
         //run through percolation of all tiles, set collision for all islands

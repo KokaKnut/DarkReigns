@@ -174,10 +174,44 @@ public class TileGraphics : MonoBehaviour {
         mesh.uv = uvs;
 
         //Assign our mesh to the GameObject
-        //MeshFilter mesh_filter = GetComponent<MeshFilter>();
-        //mesh_filter.mesh = mesh;
+        MeshFilter mesh_filter = GetComponent<MeshFilter>();
+        mesh_filter.mesh = mesh;
 
-        BuildSprite(tileMap, tileSize);
+        BuildTexture(tileMap, tileSize);
     }
 
+    public void BuildTexture(TileMap tileMap, float tileSize)
+    {
+        sizeX = tileMap.sizeX;
+        sizeY = tileMap.sizeY;
+
+        int texWidth = sizeX * tileDefs.tileResolution;
+        int texHeight = sizeY * tileDefs.tileResolution;
+        Texture2D texture = new Texture2D(texWidth, texHeight);
+
+        tileTypesDefinitions = new Dictionary<Tile.TYPE, TileTypeGraphics>();
+        foreach (TileTypeGraphics def in tileDefs.tileTypes)
+        {
+            tileTypesDefinitions[def.type] = def;
+        }
+
+        for (int y = 0; y < sizeY; y++)
+        {
+            for (int x = 0; x < sizeX; x++)
+            {
+                Sprite sprite = tileTypesDefinitions[tileMap.GetTile(x, y).type].sprite;
+                Color[] p = sprite.texture.GetPixels((int)(sprite.textureRect.x), (int)(sprite.textureRect.y), tileDefs.tileResolution, tileDefs.tileResolution);
+                texture.SetPixels(x * tileDefs.tileResolution, y * tileDefs.tileResolution, tileDefs.tileResolution, tileDefs.tileResolution, p);
+            }
+        }
+
+        texture.filterMode = FilterMode.Point;
+        texture.wrapMode = TextureWrapMode.Clamp;
+        texture.Apply();
+
+        MeshRenderer mesh_rederer = GetComponent<MeshRenderer>();
+        Material mat = Material.Instantiate(mesh_rederer.sharedMaterial);
+        mat.mainTexture = texture;
+        mesh_rederer.sharedMaterial = mat;
+    }
 }
