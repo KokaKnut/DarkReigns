@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class TileGraphics : MonoBehaviour {
 
     const int SPRITE_MAX = 2048; //2048
+    const int MESH_MAX = 2048; //arbitrary
 
     public GameObject spriteRendererPrefab;
 
@@ -32,6 +33,22 @@ public class TileGraphics : MonoBehaviour {
             }
     }
 
+    public void RemoveMeshes()
+    {
+        if (Application.isEditor)
+            foreach (MeshRenderer spriteR in GetComponentsInChildren<MeshRenderer>())
+            {
+                if (spriteR.gameObject != gameObject)
+                    DestroyImmediate(spriteR.gameObject);
+            }
+        else
+            foreach (MeshRenderer spriteR in GetComponentsInChildren<MeshRenderer>())
+            {
+                if (spriteR.gameObject != gameObject)
+                    Destroy(spriteR.gameObject);
+            }
+    }
+
     public void SpriteToggle(bool on)
     {
         if (on)
@@ -41,6 +58,18 @@ public class TileGraphics : MonoBehaviour {
         else
         {
             gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        }
+    }
+
+    public void MeshToggle(bool on)
+    {
+        if (on)
+        {
+            gameObject.GetComponent<MeshRenderer>().enabled = true;
+        }
+        else
+        {
+            gameObject.GetComponent<MeshRenderer>().enabled = false;
         }
     }
 
@@ -116,8 +145,7 @@ public class TileGraphics : MonoBehaviour {
         }
     }
     
-    //useless, now using sprites
-    public void BuildMesh(TileMap tileMap, float tileSize)
+    public void BuildMeshOld(TileMap tileMap, float tileSize)
     {
         sizeX = tileMap.sizeX;
         sizeY = tileMap.sizeY;
@@ -180,7 +208,20 @@ public class TileGraphics : MonoBehaviour {
         BuildTexture(tileMap, tileSize);
     }
 
-    public void BuildTexture(TileMap tileMap, float tileSize)
+    public void BuildMesh(TileMap tileMap, float tileSize)
+    {
+        Texture2D texture = BuildTexture(tileMap, tileSize);
+        //sizeX and sizeY were set in BuildTexture call
+
+        RemoveMeshes();
+                
+        if (sizeX * tileDefs.tileResolution <= SPRITE_MAX && sizeY * tileDefs.tileResolution <= SPRITE_MAX)
+        {
+
+        }
+    }
+
+    public Texture2D BuildTexture(TileMap tileMap, float tileSize)
     {
         sizeX = tileMap.sizeX;
         sizeY = tileMap.sizeY;
@@ -208,6 +249,8 @@ public class TileGraphics : MonoBehaviour {
         texture.filterMode = FilterMode.Point;
         texture.wrapMode = TextureWrapMode.Clamp;
         texture.Apply();
+
+        return texture;
 
         MeshRenderer mesh_rederer = GetComponent<MeshRenderer>();
         Material mat = Material.Instantiate(mesh_rederer.sharedMaterial);
