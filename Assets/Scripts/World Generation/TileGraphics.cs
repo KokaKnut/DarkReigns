@@ -9,6 +9,7 @@ public class TileGraphics : MonoBehaviour {
     const int MESH_MAX = 2048; //arbitrary
 
     public GameObject spriteRendererPrefab;
+    public GameObject meshRendererPrefab;
 
     public TileTextureDefs tileDefs;
     private Dictionary<Tile.TYPE, TileTypeGraphics> tileTypesDefinitions;
@@ -215,9 +216,123 @@ public class TileGraphics : MonoBehaviour {
 
         RemoveMeshes();
                 
-        if (sizeX * tileDefs.tileResolution <= SPRITE_MAX && sizeY * tileDefs.tileResolution <= SPRITE_MAX)
+        if (sizeX * tileDefs.tileResolution <= MESH_MAX && sizeY * tileDefs.tileResolution <= MESH_MAX)
         {
+            MeshToggle(true);
 
+            //Generate the mesh data
+            Vector3[] verticies = new Vector3[4];
+            Vector3[] normals = new Vector3[4];
+            Vector2[] uvs = new Vector2[4];
+            int[] triangles = new int[6];
+
+            verticies[0] = transform.position;
+            verticies[1] = new Vector3(transform.position.x + sizeX * tileDefs.tileResolution, transform.position.y, transform.position.z);
+            verticies[2] = new Vector3(transform.position.x, transform.position.y + sizeY * tileDefs.tileResolution, transform.position.z);
+            verticies[3] = new Vector3(transform.position.x + sizeX * tileDefs.tileResolution, transform.position.y + sizeY * tileDefs.tileResolution, transform.position.z);
+
+            normals[0] = Vector3.back;
+            normals[1] = Vector3.back;
+            normals[2] = Vector3.back;
+            normals[3] = Vector3.back;
+
+            uvs[0] = Vector2.zero;
+            uvs[1] = new Vector2(1, 0);
+            uvs[2] = new Vector2(0, 1);
+            uvs[3] = new Vector2(1, 1);
+
+            triangles[0] = 0;
+            triangles[1] = 2;
+            triangles[2] = 3;
+            triangles[3] = 0;
+            triangles[4] = 3;
+            triangles[5] = 1;
+
+            //Create new mesh with our data
+            Mesh mesh = new Mesh();
+            mesh.vertices = verticies;
+            mesh.triangles = triangles;
+            mesh.normals = normals;
+            mesh.uv = uvs;
+
+            //Assign our mesh to the GameObject
+            MeshFilter mesh_filter = GetComponent<MeshFilter>();
+            mesh_filter.mesh = mesh;
+
+            //Assign our texture to an instanced material, then give that to our renderer
+            MeshRenderer mesh_rederer = GetComponent<MeshRenderer>();
+            Material mat = Material.Instantiate(mesh_rederer.sharedMaterial);
+            mat.mainTexture = texture;
+            mesh_rederer.material = mat;
+        }
+        else
+        {
+            int numX = (sizeX * tileDefs.tileResolution) / MESH_MAX + 1;
+            int numY = (sizeY * tileDefs.tileResolution) / MESH_MAX + 1;
+
+            MeshToggle(false);
+
+            for (int y = 0; y < numY; y++)
+            {
+                for (int x = 0; x < numX; x++)
+                {
+                    int texWidth = MESH_MAX;
+                    if (x == numX - 1)
+                        texWidth = (sizeX * tileDefs.tileResolution) % MESH_MAX;
+                    int texHeight = MESH_MAX;
+                    if (y == numY - 1)
+                        texHeight = (sizeY * tileDefs.tileResolution) % MESH_MAX;
+
+                    GameObject child_object = GameObject.Instantiate<GameObject>(meshRendererPrefab);
+                    child_object.transform.SetParent(transform);
+                    child_object.transform.localPosition = new Vector3((x * MESH_MAX) / (tileDefs.tileResolution / tileSize), (y * MESH_MAX) / (tileDefs.tileResolution / tileSize), transform.position.z);
+
+                    //Generate the mesh data
+                    Vector3[] verticies = new Vector3[4];
+                    Vector3[] normals = new Vector3[4];
+                    Vector2[] uvs = new Vector2[4];
+                    int[] triangles = new int[6];
+
+                    verticies[0] = transform.position;
+                    verticies[1] = new Vector3(transform.position.x + texWidth / (tileDefs.tileResolution / tileSize), transform.position.y, transform.position.z);
+                    verticies[2] = new Vector3(transform.position.x, transform.position.y + texHeight / (tileDefs.tileResolution / tileSize), transform.position.z);
+                    verticies[3] = new Vector3(transform.position.x + texWidth / (tileDefs.tileResolution / tileSize), transform.position.y + texHeight / (tileDefs.tileResolution / tileSize), transform.position.z);
+
+                    normals[0] = Vector3.back;
+                    normals[1] = Vector3.back;
+                    normals[2] = Vector3.back;
+                    normals[3] = Vector3.back;
+
+                    uvs[0] = new Vector2(((float)x * MESH_MAX) / texture.width, ((float)y * MESH_MAX) / texture.height);
+                    uvs[1] = new Vector2(((float)x * MESH_MAX + texWidth) / texture.width, ((float)y * MESH_MAX) / texture.height);
+                    uvs[2] = new Vector2(((float)x * MESH_MAX) / texture.width, ((float)y * MESH_MAX + texHeight) / texture.height);
+                    uvs[3] = new Vector2(((float)x * MESH_MAX + texWidth) / texture.width, ((float)y * MESH_MAX + texHeight) / texture.height);
+
+                    triangles[0] = 0;
+                    triangles[1] = 2;
+                    triangles[2] = 3;
+                    triangles[3] = 0;
+                    triangles[4] = 3;
+                    triangles[5] = 1;
+
+                    //Create new mesh with our data
+                    Mesh mesh = new Mesh();
+                    mesh.vertices = verticies;
+                    mesh.triangles = triangles;
+                    mesh.normals = normals;
+                    mesh.uv = uvs;
+
+                    //Assign our mesh to the GameObject
+                    MeshFilter mesh_filter = child_object.GetComponent<MeshFilter>();
+                    mesh_filter.mesh = mesh;
+
+                    //Assign our texture to an instanced material, then give that to our renderer
+                    MeshRenderer mesh_rederer = child_object.GetComponent<MeshRenderer>();
+                    Material mat = Material.Instantiate(mesh_rederer.sharedMaterial);
+                    mat.mainTexture = texture;
+                    mesh_rederer.material = mat;
+                }
+            }
         }
     }
 
@@ -251,10 +366,5 @@ public class TileGraphics : MonoBehaviour {
         texture.Apply();
 
         return texture;
-
-        MeshRenderer mesh_rederer = GetComponent<MeshRenderer>();
-        Material mat = Material.Instantiate(mesh_rederer.sharedMaterial);
-        mat.mainTexture = texture;
-        mesh_rederer.sharedMaterial = mat;
     }
 }
