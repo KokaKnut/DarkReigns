@@ -73,6 +73,7 @@ public class TileMapGenerator : MonoBehaviour {
         }
 
         List<TileMapPrefabDef> drawn = new List<TileMapPrefabDef>();
+        List<TileMapPrefabDef> drawnFully = new List<TileMapPrefabDef>();
 
         foreach (TileMapPrefabDef prefab in uniques)
         {
@@ -99,7 +100,16 @@ public class TileMapGenerator : MonoBehaviour {
         while (!done)
         {
             //choose random prefab that is currently in the map
-            TileMapPrefabDef startPrefab = drawn[(int)(random.NextDouble() * drawn.Count)];
+            int drawnIndex = (int)(random.NextDouble() * drawn.Count);
+            TileMapPrefabDef startPrefab = drawn[drawnIndex];
+            while (startPrefab.linkages >= startPrefab.linkageNumber)
+            {
+                drawn.RemoveAt(drawnIndex);
+                drawnFully.Add(startPrefab);
+
+                drawnIndex = (int)(random.NextDouble() * drawn.Count);
+                startPrefab = drawn[drawnIndex];
+            }
             //choose random opening
             int index = (int)(random.NextDouble() * (startPrefab.tileMapPrefab.tileMap.topSize + startPrefab.tileMapPrefab.tileMap.botSize + startPrefab.tileMapPrefab.tileMap.leftSize + startPrefab.tileMapPrefab.tileMap.rightSize));
             string side = "top";
@@ -152,6 +162,10 @@ public class TileMapGenerator : MonoBehaviour {
                                 }
                             }
                             prefab.coords = new Vector2(x - px, y + 1);
+                            startPrefab.linkages++;
+                            drawn.RemoveAt(drawnIndex);
+                            drawn.Add(startPrefab);
+                            prefab.linkages++;
                             drawn.Add(prefab);
                         }
                     }
@@ -185,6 +199,10 @@ public class TileMapGenerator : MonoBehaviour {
                                 }
                             }
                             prefab.coords = new Vector2(x - px, y - py);
+                            startPrefab.linkages++;
+                            drawn.RemoveAt(drawnIndex);
+                            drawn.Add(startPrefab);
+                            prefab.linkages++;
                             drawn.Add(prefab);
                         }
                     }
@@ -218,6 +236,10 @@ public class TileMapGenerator : MonoBehaviour {
                                 }
                             }
                             prefab.coords = new Vector2(x - px, y - py);
+                            startPrefab.linkages++;
+                            drawn.RemoveAt(drawnIndex);
+                            drawn.Add(startPrefab);
+                            prefab.linkages++;
                             drawn.Add(prefab);
                         }
                     }
@@ -250,6 +272,10 @@ public class TileMapGenerator : MonoBehaviour {
                                 }
                             }
                             prefab.coords = new Vector2(x  + 1, y - py);
+                            startPrefab.linkages++;
+                            drawn.RemoveAt(drawnIndex);
+                            drawn.Add(startPrefab);
+                            prefab.linkages++;
                             drawn.Add(prefab);
                         }
                     }
