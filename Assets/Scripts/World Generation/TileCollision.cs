@@ -9,20 +9,30 @@ public class TileCollision : MonoBehaviour {
     public int splitY;
     public Tile.TYPE[] solid;
     public Tile.TYPE[] air;
+    public GameObject ropePrefab;
 
     // remove all of the edge colliders that were already on the gameObject
     public void RemoveCollision()
     {
         if (Application.isEditor)
-            foreach (EdgeCollider2D col in GetComponents<EdgeCollider2D>())
+        {
+            foreach (GameObject rope in GameObject.FindGameObjectsWithTag("Rope"))
+                DestroyImmediate(rope.gameObject);
+            foreach (EdgeCollider2D edge in GetComponents<EdgeCollider2D>())
             {
-                DestroyImmediate(col);
+                DestroyImmediate(edge);
             }
+        }
         else
-            foreach (EdgeCollider2D col in GetComponents<EdgeCollider2D>())
+        {
+            foreach (GameObject rope in GameObject.FindGameObjectsWithTag("Rope"))
+                Destroy(rope.gameObject);
+            foreach (EdgeCollider2D edge in GetComponents<EdgeCollider2D>())
             {
-                Destroy(col);
+
+                Destroy(edge);
             }
+        }
     }
 
     public void BuildColliderFast(TileMap tileMap, float tileSize)
@@ -194,5 +204,61 @@ public class TileCollision : MonoBehaviour {
             }
         } while (box[box.Count - 1] != box[0] && box.Count < 4000);
         return box.ToArray();
+    }
+
+    public void BuildRopeColliders(TileMap tileMap, float tileSize)
+    {
+
+        //run through percolation of all tiles, set collision for all ropes
+        ArrayList doneTiles = new ArrayList();
+        int x = 0;
+        int y = 0;
+        while (tileMap.sizeX * tileMap.sizeY > doneTiles.Count || y < tileMap.sizeY)
+        {
+            if (!(doneTiles.Contains(tileMap.GetTile(x, y))))
+            {
+                if(tileMap.GetTile(x, y).type == Tile.TYPE.rope)
+                {
+                    List<Tile> rope = new List<Tile>();
+                    Vector2[] ropeLine = new Vector2[2];
+
+                    rope.Add(tileMap.GetTile(x, y));
+                    ropeLine[0] = Vector2.zero;
+                    ropeLine[1] = new Vector2(ropeLine[0].x, ropeLine[0].y + tileSize / 3);
+
+                    int i = 1;
+                    while(tileMap.GetTile(x, y + i).type == Tile.TYPE.rope)
+                    {
+                        rope.Add(tileMap.GetTile(x, y + i));
+                        ropeLine[1] = new Vector2(ropeLine[1].x, ropeLine[1].y + tileSize);
+                        i++;
+                    }
+
+                    GameObject child_object = GameObject.Instantiate<GameObject>(ropePrefab);
+                    child_object.transform.SetParent(transform);
+                    child_object.transform.localPosition = new Vector3(x * tileSize + tileSize / 2, y * tileSize + tileSize / 3, 0);
+                    child_object.GetComponent<EdgeCollider2D>().points = ropeLine;
+
+                    GameObject child_child_object = child_object.transform.GetChild(0).gameObject;
+                    child_child_object.transform.localPosition = new Vector3(-tileSize / 2, i * tileSize - tileSize / 3, 0);
+                    child_child_object.GetComponent<EdgeCollider2D>().points = new Vector2[] { Vector2.zero, new Vector2(tileSize, 0) };
+
+                    foreach (Tile tile in rope)
+                    {
+                        doneTiles.Add(tile);
+                    }
+                }
+                else
+                {
+                    doneTiles.Add(tileMap.GetTile(x, y));
+                }
+            }
+            x++;
+            if (x >= tileMap.sizeX)
+            {
+                x = 0;
+                y++;
+            }
+        }
     }
 }

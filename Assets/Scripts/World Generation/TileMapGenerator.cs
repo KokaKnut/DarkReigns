@@ -37,7 +37,10 @@ public class TileMapGenerator : MonoBehaviour {
 
         // Now build the polycollider with the tile data
         if (collison)
+        {
             gameObject.GetComponent<TileCollision>().BuildColliderFast(tileMap, tileSize);
+            gameObject.GetComponent<TileCollision>().BuildRopeColliders(tileMap, tileSize);
+        }
         else
             gameObject.GetComponent<TileCollision>().RemoveCollision();
     }

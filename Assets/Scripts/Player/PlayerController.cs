@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
         set
         {
             _state = value;
+            gameObject.layer = 8; // 8 is Player
             switch (value)
             {
                 case STATE.idle:
@@ -35,6 +36,10 @@ public class PlayerController : MonoBehaviour
                     break;
                 case STATE.jumping:
                     animator.SetInteger("animState", 2);
+                    break;
+                case STATE.roping:
+                    animator.SetInteger("animState", 2);
+                    gameObject.layer = 12; // 12 is PlayerIgnoreWorld
                     break;
             }
         }
@@ -51,6 +56,7 @@ public class PlayerController : MonoBehaviour
     public float hangTimeDown = .2f;
     public float hangTimeDownTimeFactor = .2f;
     public int numberOfJumps = 1;
+    public float fallFloorTime = .1f;
 
     // JUMP STUFF---------------------------
     [Header("VISIBLE VARS")]
@@ -161,7 +167,7 @@ public class PlayerController : MonoBehaviour
 
             if (grounded || state != STATE.jumping)
             {
-                jumpCount = 0;
+                jumpCount = 1;
                 jumpDuration = jumpTime;
             }
         }
@@ -174,6 +180,9 @@ public class PlayerController : MonoBehaviour
 
     public void Move(float x, float y, bool jump)
     {
+        if (y < -.7f)
+            FallFloor();
+
         //checking if we should grab a rope
         if (state != STATE.roping && y > .7f && rope != null)
         {
@@ -228,6 +237,25 @@ public class PlayerController : MonoBehaviour
         {
             Flip();
         }
+    }
+
+    private void FallFloor()
+    {
+        //Collider2D[] fallFloors = Physics2D.OverlapAreaAll(rb.worldCenterOfMass - GetComponent<BoxCollider2D>().size, rb.worldCenterOfMass + GetComponent<BoxCollider2D>().size, 13);
+
+        //foreach (Collider2D fallFloor in fallFloors)
+        //
+        //    Invoke("UndoFallFloor", fallFloorTime);
+        //    
+        //}
+
+        Physics2D.IgnoreLayerCollision(8, 13, true);
+        Invoke("UndoFallFloor", fallFloorTime);
+    }
+
+    private void UndoFallFloor()
+    {
+        Physics2D.IgnoreLayerCollision(8, 13, false);
     }
 
     private void Flip()
