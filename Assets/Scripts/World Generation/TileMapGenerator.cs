@@ -12,6 +12,8 @@ public class TileMapGenerator : MonoBehaviour {
     public float tileSize = 1f;
 
     [Header("Generation vars")]
+    public bool isSeed = false;
+    public int seed = 0;
     public float temp = 1f;
     public bool border = true;
     public bool collison = true;
@@ -30,7 +32,8 @@ public class TileMapGenerator : MonoBehaviour {
         tileMap = new TileMap(sizeX, sizeY);
 
         // temporary random tiles algorithm
-        GenerateWorld();
+        while(!GenerateWorld())
+            tileMap = new TileMap(sizeX, sizeY);
         
         // Now build the mesh with the tile map we made
         gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
@@ -45,9 +48,13 @@ public class TileMapGenerator : MonoBehaviour {
             gameObject.GetComponent<TileCollision>().RemoveCollision();
     }
 
-    public void GenerateWorld()
+    public bool GenerateWorld()
     {
-        System.Random random = new System.Random();
+        System.Random random = new System.Random(seed);
+        if (!isSeed)
+            random = new System.Random();
+
+        int[,] solution = GenerateSolution();
 
         if (border)
         {
@@ -300,6 +307,17 @@ public class TileMapGenerator : MonoBehaviour {
                     tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.air));
             }
         }
+
+        return true;
+    }
+
+    private int[,] GenerateSolution()
+    {
+        int[,] solution = new int[sizeX, sizeY];
+
+
+
+        return solution;
     }
 
     [ContextMenu("Random Tilemap")]
