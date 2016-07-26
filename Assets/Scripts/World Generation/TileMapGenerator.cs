@@ -143,16 +143,20 @@ public class TileMapGenerator : MonoBehaviour {
             }
 
             //run through list of opennings until linkages are filled
+            while(firstPrefab.linkages < firstPrefab.linkageNumber)
+            {
+                //make/choose a list of prefabs to shuffle/shuffled prefabs
+                List<TileMapPrefabDef> availablePrefabs = new List<TileMapPrefabDef>();
+                
 
-            //make/choose a list of prefabs
+                //run through list of prefabs
 
-            //run through list of prefabs
+                    //make list of prefab opennings on prefab
 
-            //make list of prefab opennings on prefab
+                    //run through list of opennings on prefab
 
-            //run through list of opennings on prefab
-
-            //place prefab if it fits, and if it does, exit loop and exi the next one too (this leaves us continueing the list of opennings)
+                        //place prefab if it fits, and if it does, exit loop and exi the next one too (this leaves us continueing the list of opennings)
+            }
 
             //remove first item from list "drawn" and add it to "drawnFully"
 
