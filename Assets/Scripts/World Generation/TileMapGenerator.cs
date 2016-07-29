@@ -75,11 +75,21 @@ public class TileMapGenerator : MonoBehaviour {
                 uniques.Add(prefab);
         }
 
+        float totalRarity = 0f;
         commons = new List<TileMapPrefabDef>();
         foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
         {
             if (!(prefab.unique))
+            {
                 commons.Add(prefab);
+                totalRarity += prefab.rarity;
+            }
+        }
+
+        Dictionary<float, TileMapPrefabDef> commonList = new Dictionary<float, TileMapPrefabDef>();
+        foreach (TileMapPrefabDef prefab in commons)
+        {
+            //commons.
         }
 
         int[,] solution = GenerateSolution();
