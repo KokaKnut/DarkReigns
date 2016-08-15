@@ -74,22 +74,15 @@ public class TileMapGenerator : MonoBehaviour {
             if (prefab.unique)
                 uniques.Add(prefab);
         }
-
-        float totalRarity = 0f;
+        
         commons = new List<TileMapPrefabDef>();
+        WeightedShuffler<TileMapPrefabDef> shuffler = new WeightedShuffler<TileMapPrefabDef>();
         foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
         {
             if (!(prefab.unique))
             {
                 commons.Add(prefab);
-                totalRarity += prefab.rarity;
             }
-        }
-
-        Dictionary<float, TileMapPrefabDef> commonList = new Dictionary<float, TileMapPrefabDef>();
-        foreach (TileMapPrefabDef prefab in commons)
-        {
-            //commons.
         }
 
         int[,] solution = GenerateSolution();
@@ -155,8 +148,7 @@ public class TileMapGenerator : MonoBehaviour {
             //run through list of opennings until linkages are filled
             while(firstPrefab.linkages < firstPrefab.linkageNumber)
             {
-                //make/choose a list of prefabs to shuffle/shuffled prefabs
-                List<TileMapPrefabDef> availablePrefabs = new List<TileMapPrefabDef>();
+                //call the shuffler for a new list
                 
 
                 //run through list of prefabs
