@@ -1,21 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-public class WeightedItem
+public class WeightedItem<T>
 {
-    public object item;
-    public float rangeMin;
-    public float rangeMax;
-    public float weight;
+    public T item;
+    public double rangeMin;
+    public double rangeMax;
+    public double weight;
 
     public WeightedItem()
     {
-        item = null;
+        item = default(T);
         rangeMin = 0;
         rangeMax = 0;
         weight = 0;
     }
 
-    public WeightedItem(object o, float w, float rMin, float rMax)
+    public WeightedItem(T o, double w, double rMin, double rMax)
     {
         item = o;
         rangeMin = rMin;
@@ -24,24 +25,35 @@ public class WeightedItem
     }
 }
 
-public class WeightedShuffler {
+public class WeightedShuffler<T> {
 
-    private List<WeightedItem> items;
-    private float weightSum;
-    private float weightMin;
+    private List<WeightedItem<T>> items;
+    private double weightSum;
+    private double weightMin;
+    private Random random;
 
 	//constructor
     public WeightedShuffler()
     {
-        items = new List<WeightedItem>();
+        items = new List<WeightedItem<T>>();
         weightSum = 0;
-        weightMin = float.MaxValue;
+        weightMin = double.MaxValue;
+        random = new Random();
+
+    }
+
+    public WeightedShuffler(int seed)
+    {
+        items = new List<WeightedItem<T>>();
+        weightSum = 0;
+        weightMin = double.MaxValue;
+        random = new Random(seed);
     }
 
     //adds an item to current list with its probabillity
-    public void Add(object o, float weight)
+    public void Add(T o, double weight)
     {
-        items.Add(new WeightedItem(o, weight, weightSum, weightSum + weight));
+        items.Add(new WeightedItem<T>(o, weight, weightSum, weightSum + weight));
 
         if (weightMin > weight)
             weightMin = weight;
@@ -49,24 +61,45 @@ public class WeightedShuffler {
         weightSum += weight;
     }
     
-    //shuffle the list
-    public List<object> GetShufledList()
+    //return a shuffled list
+    public List<T> GetShufledList()
     {
-        List<object> list = new List<object>();
+        List<T> list = new List<T>();
 
         //copy the original list so we can remove items without losing them
-        List<WeightedItem> itemsP = new List<WeightedItem>();
-        foreach (WeightedItem item in items)
+        List<WeightedItem<T>> itemsP = new List<WeightedItem<T>>();
+        foreach (WeightedItem<T> item in items)
         {
             itemsP.Add(item);
         }
 
-        //loop until empty
-        //get random number in range
-        //search down items looking at range for appropiate hit
-        //if range is missing, linear probe for new hit
-        //
+        //loop until itemsP is empty
+        while (itemsP.Count > 0)
+        {
+            //get random number in range
+            double num = random.NextDouble() * weightSum;
+            //search down items looking at range for appropiate hit
+            int hit = -1;
+            int i = 0;
+            for (; i < itemsP.Count && itemsP[i].rangeMax < num; i++) ;
+            if (i < itemsP.Count && itemsP[i].rangeMin < num + double.Epsilon)
+                hit = i;
+            //if range is missing, linear probe for new hit
+            for (double d = 0; d < weightSum && hit < 0; d += weightMin)
+            {
+                num += (weightSum * .5) - weightMin;
+                num = num % weightSum;
+                for (i = 0; i < itemsP.Count && itemsP[i].rangeMax < num; i++) ;
+                if (i < itemsP.Count && itemsP[i].rangeMin < num + double.Epsilon)
+                    hit = i;
+            }
+            //add hit to list and remve it from itemsP
+            list.Add(itemsP[hit].item);
+            itemsP.RemoveAt(hit);
+        }
 
         return list;
     }
+
+    //TODO: make it calculate only the NEXT item in the list, not all at once
 }

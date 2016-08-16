@@ -6,7 +6,7 @@ public struct TileMapPrefabDef
 {
     public TileMapPrefabBuilder tileMapPrefab;
     public bool unique;
-    public float rarity;
+    public double rarity;
     public Vector2 coords;
     public int linkageNumber;
 

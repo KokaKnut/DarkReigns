@@ -76,12 +76,17 @@ public class TileMapGenerator : MonoBehaviour {
         }
         
         commons = new List<TileMapPrefabDef>();
-        WeightedShuffler<TileMapPrefabDef> shuffler = new WeightedShuffler<TileMapPrefabDef>();
+
+        WeightedShuffler<TileMapPrefabDef> shuffler = new WeightedShuffler<TileMapPrefabDef>(seed);
+        if (!isSeed)
+            shuffler = new WeightedShuffler<TileMapPrefabDef>();
+
         foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
         {
             if (!(prefab.unique))
             {
                 commons.Add(prefab);
+                shuffler.Add(prefab, prefab.rarity);
             }
         }
 
@@ -146,18 +151,24 @@ public class TileMapGenerator : MonoBehaviour {
             }
 
             //run through list of opennings until linkages are filled
-            while(firstPrefab.linkages < firstPrefab.linkageNumber)
+            while(firstPrefab.linkages < firstPrefab.linkageNumber && !done)
             {
                 //call the shuffler for a new list
-                
+                List<TileMapPrefabDef> shuffledList = shuffler.GetShufledList();
 
                 //run through list of prefabs
 
-                    //make list of prefab opennings on prefab
+                //make list of prefab opennings on prefab
 
-                    //run through list of opennings on prefab
+                //run through list of opennings on prefab
 
-                        //place prefab if it fits, and if it does, exit loop and exi the next one too (this leaves us continueing the list of opennings)
+                //place prefab if it fits, and if it does, exit loop and exi the next one too (this leaves us continueing the list of opennings)
+
+                if (panic++ >= 50000)
+                {
+                    print("Linkage filling caused overflow panic!");
+                    done = true;
+                }
             }
 
             //remove first item from list "drawn" and add it to "drawnFully"
