@@ -4,6 +4,8 @@ using System.Collections;
 [System.Serializable]
 public struct TileMapPrefabDef
 {
+
+    public string Name;
     public TileMapPrefabBuilder tileMapPrefab;
     public bool unique;
     public double rarity;

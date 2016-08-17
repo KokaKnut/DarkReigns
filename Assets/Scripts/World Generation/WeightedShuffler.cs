@@ -82,7 +82,7 @@ public class WeightedShuffler<T> {
             int hit = -1;
             int i = 0;
             for (; i < itemsP.Count && itemsP[i].rangeMax < num; i++) ;
-            if (i < itemsP.Count && itemsP[i].rangeMin < num + double.Epsilon)
+            if (i < itemsP.Count && itemsP[i].rangeMin < num + double.Epsilon * i)
                 hit = i;
             //if range is missing, linear probe for new hit
             for (double d = 0; d < weightSum && hit < 0; d += weightMin)
@@ -90,12 +90,20 @@ public class WeightedShuffler<T> {
                 num += (weightSum * .5) - weightMin;
                 num = num % weightSum;
                 for (i = 0; i < itemsP.Count && itemsP[i].rangeMax < num; i++) ;
-                if (i < itemsP.Count && itemsP[i].rangeMin < num + double.Epsilon)
+                if (i < itemsP.Count && itemsP[i].rangeMin < num + double.Epsilon * i)
                     hit = i;
             }
             //add hit to list and remve it from itemsP
-            list.Add(itemsP[hit].item);
-            itemsP.RemoveAt(hit);
+            //TODO: fix bug with missing the very low chance items, causing hit == -1. this should never happen
+            if (hit >= 0)
+            {
+                list.Add(itemsP[hit].item);
+                itemsP.RemoveAt(hit);
+            }
+            else
+            {
+                break;
+            }
         }
 
         return list;

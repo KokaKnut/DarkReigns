@@ -158,11 +158,11 @@ public class TileMapGenerator : MonoBehaviour {
 
                 //run through list of prefabs
 
-                //make list of prefab opennings on prefab
+                //  make list of prefab opennings on prefab
 
-                //run through list of opennings on prefab
+                //  run through list of opennings on prefab
 
-                //place prefab if it fits, and if it does, exit loop and exi the next one too (this leaves us continueing the list of opennings)
+                //      place prefab if it fits, and if it does, exit loop and exit the next one too (this leaves us continueing the list of opennings)
 
                 if (panic++ >= 50000)
                 {
@@ -185,7 +185,7 @@ public class TileMapGenerator : MonoBehaviour {
             for (int x = 0; x < sizeX; x++)
             {
                 if (tileMap.GetTile(x, y) == null)
-                    tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.air));
+                    tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
             }
         }
 
