@@ -150,19 +150,83 @@ public class TileMapGenerator : MonoBehaviour {
                 opennings[i] = tempint;
             }
 
+            int fO = 0;
             //run through list of opennings until linkages are filled
-            while(firstPrefab.linkages < firstPrefab.linkageNumber && !done)
+            while(firstPrefab.linkages < firstPrefab.linkageNumber && fO < opennings.Count && !done)
             {
                 //call the shuffler for a new list
                 List<TileMapPrefabDef> shuffledList = shuffler.GetShufledList();
 
+                int p = 0;
                 //run through list of prefabs
+                while (p < shuffledList.Count && !done)
+                {
+                    //make list of prefab opennings on prefab
+                    TileMapPrefabDef prospectivePrefab = drawn[0];
 
-                //  make list of prefab opennings on prefab
+                    //make list of opennings
+                    List<int[]> prospectiveOpennings = new List<int[]>();
+                    foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.top)
+                    {
+                        prospectiveOpennings.Add(new int[] { 0, openning });
+                    }
+                    foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.bot)
+                    {
+                        prospectiveOpennings.Add(new int[] { 1, openning });
+                    }
+                    foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.left)
+                    {
+                        prospectiveOpennings.Add(new int[] { 2, openning });
+                    }
+                    foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.right)
+                    {
+                        prospectiveOpennings.Add(new int[] { 3, openning });
+                    }
 
-                //  run through list of opennings on prefab
+                    //shuffle list of opennings
+                    for (int i = prospectiveOpennings.Count - 1, j; i >= 1; i--)
+                    {
+                        j = random.Next(i);
+                        int[] tempint = prospectiveOpennings[j];
+                        prospectiveOpennings[j] = prospectiveOpennings[i];
+                        prospectiveOpennings[i] = tempint;
+                    }
 
-                //      place prefab if it fits, and if it does, exit loop and exit the next one too (this leaves us continueing the list of opennings)
+                    int x = 0, y = 0;
+                    int px = 0, py = 0;
+                    int o = 0;
+                    //run through list of opennings on prefab
+                    while (o < prospectiveOpennings.Count && !done)
+                    {
+                        //place prefab if it fits, and if it does, exit loop and exit the next one too (this leaves us continueing the list of opennings)
+                        switch (prospectiveOpennings[o][0])
+                        {
+                            case 0: //top
+                                x = (int)firstPrefab.coords.x + opennings[fO][1];
+                                y = (int)firstPrefab.coords.y + firstPrefab.tileMapPrefab.tileMap.sizeY - 1;
+                                px = prospectiveOpennings[o][1];
+                                break;
+                            case 1: //bot
+
+                                break;
+                            case 2: //left
+
+                                break;
+                            case 3: //right
+
+                                break;
+                        }
+                    }
+                    p++;
+
+                    if (panic++ >= 50000)
+                    {
+                        print("Shuffled list caused overflow panic!");
+                        done = true;
+                    }
+                }
+
+                fO++;
 
                 if (panic++ >= 50000)
                 {

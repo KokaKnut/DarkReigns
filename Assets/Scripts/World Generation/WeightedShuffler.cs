@@ -110,4 +110,13 @@ public class WeightedShuffler<T> {
     }
 
     //TODO: make it calculate only the NEXT item in the list, not all at once
+    public T Next()
+    {
+        return items[0].item;
+    }
+
+    public void Reshuffle()
+    {
+
+    }
 }
