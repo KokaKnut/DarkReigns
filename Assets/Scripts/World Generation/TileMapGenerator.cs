@@ -205,6 +205,34 @@ public class TileMapGenerator : MonoBehaviour {
                                 x = (int)firstPrefab.coords.x + opennings[fO][1];
                                 y = (int)firstPrefab.coords.y + firstPrefab.tileMapPrefab.tileMap.sizeY - 1;
                                 px = prospectiveOpennings[o][1];
+                                if ((x - px) > 0 && (x + (prospectivePrefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y + prospectivePrefab.tileMapPrefab.tileMap.sizeY) < (tileMap.sizeY - 1))
+                                {
+                                    bool free = true;
+                                    for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                    {
+                                        for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                        {
+                                            if (tileMap.GetTile(x - px + j, y + 1 + i) != null)
+                                                free = false;
+                                        }
+                                    }
+                                    if (free)
+                                    {
+                                        for (int i = 0; i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                        {
+                                            for (int j = 0; j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                            {
+                                                tileMap.SetTile(x - px + j, y + 1 + i, new Tile(x - px + j, y + 1 + i, prospectivePrefab.tileMapPrefab.tileMap.GetTile(j, i).type));
+                                            }
+                                        }
+                                        prospectivePrefab.coords = new Vector2(x - px, y + 1);
+                                        firstPrefab.linkages++; // TODO: make this recalculate, not just increment
+                                        drawn.RemoveAt(0);
+                                        drawn.Add(firstPrefab);
+                                        prospectivePrefab.linkages++;
+                                        drawn.Add(prospectivePrefab);
+                                    }
+                                }
                                 break;
                             case 1: //bot
 
