@@ -117,7 +117,7 @@ public class TileMapGenerator : MonoBehaviour {
         if (drawn.Count == 0 || commons.Count == 0)
             done = true;
 
-        while (!done)
+        while (drawn.Count > 0 && !done)
         {
             //choose first item on the list "drawn"
             TileMapPrefabDef firstPrefab = drawn[0];
@@ -162,7 +162,7 @@ public class TileMapGenerator : MonoBehaviour {
                 while (p < shuffledList.Count && !done)
                 {
                     //make list of prefab opennings on prefab
-                    TileMapPrefabDef prospectivePrefab = drawn[0];
+                    TileMapPrefabDef prospectivePrefab = shuffledList[p];
 
                     //make list of opennings
                     List<int[]> prospectiveOpennings = new List<int[]>();
@@ -194,17 +194,17 @@ public class TileMapGenerator : MonoBehaviour {
 
                     int x = 0, y = 0;
                     int px = 0, py = 0;
-                    int o = 0;
+                    int pO = 0;
                     //run through list of opennings on prefab
-                    while (o < prospectiveOpennings.Count && !done)
+                    while (pO < prospectiveOpennings.Count && !done)
                     {
                         //place prefab if it fits, and if it does, exit loop and exit the next one too (this leaves us continueing the list of opennings)
-                        switch (prospectiveOpennings[o][0])
+                        switch (prospectiveOpennings[pO][0])
                         {
                             case 0: //top
                                 x = (int)firstPrefab.coords.x + opennings[fO][1];
                                 y = (int)firstPrefab.coords.y + firstPrefab.tileMapPrefab.tileMap.sizeY - 1;
-                                px = prospectiveOpennings[o][1];
+                                px = prospectiveOpennings[pO][1];
                                 if ((x - px) > 0 && (x + (prospectivePrefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y + prospectivePrefab.tileMapPrefab.tileMap.sizeY) < (tileMap.sizeY - 1))
                                 {
                                     bool free = true;
@@ -235,16 +235,117 @@ public class TileMapGenerator : MonoBehaviour {
                                 }
                                 break;
                             case 1: //bot
-
+                                x = (int)firstPrefab.coords.x + opennings[fO][1];
+                                y = (int)firstPrefab.coords.y;
+                                px = prospectiveOpennings[pO][1];
+                                py = prospectivePrefab.tileMapPrefab.tileMap.sizeY;
+                                if ((x - px) > 0 && (x + (prospectivePrefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y - py) > 0)
+                                {
+                                    bool free = true;
+                                    for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                    {
+                                        for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                        {
+                                            if (tileMap.GetTile(x - px + j, y - py + i) != null)
+                                                free = false;
+                                        }
+                                    }
+                                    if (free)
+                                    {
+                                        for (int i = 0; i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                        {
+                                            for (int j = 0; j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                            {
+                                                tileMap.SetTile(x - px + j, y - py + i, new Tile(x - px + j, y - py + i, prospectivePrefab.tileMapPrefab.tileMap.GetTile(j, i).type));
+                                            }
+                                        }
+                                        prospectivePrefab.coords = new Vector2(x - px, y - py);
+                                        firstPrefab.linkages++; // TODO: make this recalculate, not just increment
+                                        drawn.RemoveAt(0);
+                                        drawn.Add(firstPrefab);
+                                        prospectivePrefab.linkages++;
+                                        drawn.Add(prospectivePrefab);
+                                    }
+                                }
                                 break;
                             case 2: //left
-
+                                x = (int)firstPrefab.coords.x;
+                                y = (int)firstPrefab.coords.y + opennings[fO][1];
+                                px = prospectivePrefab.tileMapPrefab.tileMap.sizeX;
+                                py = prospectiveOpennings[pO][1];
+                                if ((y - py) > 0 && (y + (prospectivePrefab.tileMapPrefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x - px) > 0)
+                                {
+                                    bool free = true;
+                                    for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                    {
+                                        for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                        {
+                                            if (tileMap.GetTile(x - px + j, y - py + i) != null)
+                                                free = false;
+                                        }
+                                    }
+                                    if (free)
+                                    {
+                                        for (int i = 0; i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                        {
+                                            for (int j = 0; j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                            {
+                                                tileMap.SetTile(x - px + j, y - py + i, new Tile(x - px + j, y - py + i, prospectivePrefab.tileMapPrefab.tileMap.GetTile(j, i).type));
+                                            }
+                                        }
+                                        prospectivePrefab.coords = new Vector2(x - px, y - py);
+                                        firstPrefab.linkages++; // TODO: make this recalculate, not just increment
+                                        drawn.RemoveAt(0);
+                                        drawn.Add(firstPrefab);
+                                        prospectivePrefab.linkages++;
+                                        drawn.Add(prospectivePrefab);
+                                    }
+                                }
                                 break;
                             case 3: //right
-
+                                x = (int)firstPrefab.coords.x + firstPrefab.tileMapPrefab.tileMap.sizeX - 1;
+                                y = (int)firstPrefab.coords.y + opennings[fO][1];
+                                py = prospectiveOpennings[pO][1];
+                                if ((y - py) > 0 && (y + (prospectivePrefab.tileMapPrefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prospectivePrefab.tileMapPrefab.tileMap.sizeX) < (tileMap.sizeX - 1))
+                                {
+                                    bool free = true;
+                                    for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                    {
+                                        for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                        {
+                                            if (tileMap.GetTile(x + 1 + j, y - py + i) != null)
+                                                free = false;
+                                        }
+                                    }
+                                    if (free)
+                                    {
+                                        for (int i = 0; i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                        {
+                                            for (int j = 0; j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                            {
+                                                tileMap.SetTile(x + 1 + j, y - py + i, new Tile(x + 1 + j, y - py + i, prospectivePrefab.tileMapPrefab.tileMap.GetTile(j, i).type));
+                                            }
+                                        }
+                                        prospectivePrefab.coords = new Vector2(x + 1, y - py);
+                                        firstPrefab.linkages++; // TODO: make this recalculate, not just increment
+                                        drawn.RemoveAt(0);
+                                        drawn.Add(firstPrefab);
+                                        prospectivePrefab.linkages++;
+                                        drawn.Add(prospectivePrefab);
+                                    }
+                                }
                                 break;
                         }
+
+                        pO++;
+
+                        if (panic++ >= 50000)
+                        {
+                            print("Prefab checking list caused overflow panic!");
+                            done = true;
+                        }
                     }
+
                     p++;
 
                     if (panic++ >= 50000)
@@ -264,6 +365,8 @@ public class TileMapGenerator : MonoBehaviour {
             }
 
             //remove first item from list "drawn" and add it to "drawnFully"
+            drawnFully.Add(drawn[0]);
+            drawn.RemoveAt(0);
 
             if (panic++ >= 50000)
             {
