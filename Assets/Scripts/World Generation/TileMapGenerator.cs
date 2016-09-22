@@ -227,8 +227,8 @@ public class TileMapGenerator : MonoBehaviour {
                                         }
                                         prospectivePrefab.coords = new Vector2(x - px, y + 1);
                                         firstPrefab.linkages++; // TODO: make this recalculate, not just increment
-                                        drawn.RemoveAt(0);
-                                        drawn.Add(firstPrefab);
+                                        drawn.Remove(firstPrefab);
+                                        drawn.Insert(0, firstPrefab);
                                         prospectivePrefab.linkages++;
                                         drawn.Add(prospectivePrefab);
                                     }
@@ -262,7 +262,7 @@ public class TileMapGenerator : MonoBehaviour {
                                         prospectivePrefab.coords = new Vector2(x - px, y - py);
                                         firstPrefab.linkages++; // TODO: make this recalculate, not just increment
                                         drawn.RemoveAt(0);
-                                        drawn.Add(firstPrefab);
+                                        drawn.Insert(0, firstPrefab);
                                         prospectivePrefab.linkages++;
                                         drawn.Add(prospectivePrefab);
                                     }
@@ -296,7 +296,7 @@ public class TileMapGenerator : MonoBehaviour {
                                         prospectivePrefab.coords = new Vector2(x - px, y - py);
                                         firstPrefab.linkages++; // TODO: make this recalculate, not just increment
                                         drawn.RemoveAt(0);
-                                        drawn.Add(firstPrefab);
+                                        drawn.Insert(0, firstPrefab);
                                         prospectivePrefab.linkages++;
                                         drawn.Add(prospectivePrefab);
                                     }
@@ -329,7 +329,7 @@ public class TileMapGenerator : MonoBehaviour {
                                         prospectivePrefab.coords = new Vector2(x + 1, y - py);
                                         firstPrefab.linkages++; // TODO: make this recalculate, not just increment
                                         drawn.RemoveAt(0);
-                                        drawn.Add(firstPrefab);
+                                        drawn.Insert(0, firstPrefab);
                                         prospectivePrefab.linkages++;
                                         drawn.Add(prospectivePrefab);
                                     }
