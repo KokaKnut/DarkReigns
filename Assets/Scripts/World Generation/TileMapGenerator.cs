@@ -68,6 +68,8 @@ public class TileMapGenerator : MonoBehaviour {
             }
         }
 
+        byte[,] solution = GetComponent<ImgScanner>().ScanImg(0);
+
         uniques = new List<TileMapPrefabDef>();
         foreach(TileMapPrefabDef prefab in prefabs.prefabTypes)
         {
@@ -89,8 +91,6 @@ public class TileMapGenerator : MonoBehaviour {
                 shuffler.Add(prefab, prefab.rarity);
             }
         }
-
-        int[,] solution = GenerateSolution();
 
         List<TileMapPrefabDef> drawn = new List<TileMapPrefabDef>();
         List<TileMapPrefabDef> drawnFully = new List<TileMapPrefabDef>();
@@ -427,8 +427,6 @@ public class TileMapGenerator : MonoBehaviour {
             if (!(prefab.unique))
                 commons.Add(prefab);
         }
-
-        int[,] solution = GenerateSolution();
 
         List<TileMapPrefabDef> drawn = new List<TileMapPrefabDef>();
         List<TileMapPrefabDef> drawnFully = new List<TileMapPrefabDef>();

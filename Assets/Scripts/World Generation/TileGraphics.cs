@@ -94,7 +94,7 @@ public class TileGraphics : MonoBehaviour {
             for (int x = 0; x < sizeX; x++)
             {
                 Sprite sprite = tileTypesDefinitions[tileMap.GetTile(x, y).type].sprite;
-                Color[] p = sprite.texture.GetPixels((int)(sprite.textureRect.x), (int)(sprite.textureRect.y), tileDefs.tileResolution, tileDefs.tileResolution);
+                Color[] p = sprite.texture.GetPixels((int)(sprite.textureRect.x), (int)(sprite.textureRect.y), tileDefs.tileResolution, tileDefs.tileResolution); //TODO: switch to Color32
                 texture.SetPixels(x * tileDefs.tileResolution, y * tileDefs.tileResolution, tileDefs.tileResolution, tileDefs.tileResolution, p);
             }
         }
