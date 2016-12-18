@@ -97,7 +97,7 @@ public class TileMapGenerator : MonoBehaviour {
 
         foreach (TileMapPrefabDef prefab in uniques)
         {
-            if (prefab.rarity >= random.NextDouble())
+            if (prefab.rarity >= random.Next())
             {
                 for (int y = 0; y < prefab.tileMapPrefab.tileMap.sizeY; y++)
                 {
@@ -166,22 +166,26 @@ public class TileMapGenerator : MonoBehaviour {
 
                     //make list of opennings
                     List<int[]> prospectiveOpennings = new List<int[]>();
-                    foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.top)
-                    {
-                        prospectiveOpennings.Add(new int[] { 0, openning });
-                    }
-                    foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.bot)
-                    {
-                        prospectiveOpennings.Add(new int[] { 1, openning });
-                    }
-                    foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.left)
-                    {
-                        prospectiveOpennings.Add(new int[] { 2, openning });
-                    }
-                    foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.right)
-                    {
-                        prospectiveOpennings.Add(new int[] { 3, openning });
-                    }
+                    if (opennings[fO][0] == 1)
+                        foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.top)
+                        {
+                            prospectiveOpennings.Add(new int[] { 0, openning });
+                        }
+                    if (opennings[fO][0] == 0)
+                        foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.bot)
+                        {
+                            prospectiveOpennings.Add(new int[] { 1, openning });
+                        }
+                    if (opennings[fO][0] == 3)
+                        foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.left)
+                        {
+                            prospectiveOpennings.Add(new int[] { 2, openning });
+                        }
+                    if (opennings[fO][0] == 2)
+                        foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.right)
+                        {
+                            prospectiveOpennings.Add(new int[] { 3, openning });
+                        }
 
                     //shuffle list of opennings
                     for (int i = prospectiveOpennings.Count - 1, j; i >= 1; i--)
@@ -201,7 +205,7 @@ public class TileMapGenerator : MonoBehaviour {
                         //place prefab if it fits, and if it does, exit loop and exit the next one too (this leaves us continueing the list of opennings)
                         switch (prospectiveOpennings[pO][0])
                         {
-                            case 0: //top
+                            case 1: //top
                                 x = (int)firstPrefab.coords.x + opennings[fO][1];
                                 y = (int)firstPrefab.coords.y + firstPrefab.tileMapPrefab.tileMap.sizeY - 1;
                                 px = prospectiveOpennings[pO][1];
@@ -234,7 +238,7 @@ public class TileMapGenerator : MonoBehaviour {
                                     }
                                 }
                                 break;
-                            case 1: //bot
+                            case 0: //bot
                                 x = (int)firstPrefab.coords.x + opennings[fO][1];
                                 y = (int)firstPrefab.coords.y;
                                 px = prospectiveOpennings[pO][1];
@@ -268,7 +272,7 @@ public class TileMapGenerator : MonoBehaviour {
                                     }
                                 }
                                 break;
-                            case 2: //left
+                            case 3: //left
                                 x = (int)firstPrefab.coords.x;
                                 y = (int)firstPrefab.coords.y + opennings[fO][1];
                                 px = prospectivePrefab.tileMapPrefab.tileMap.sizeX;
@@ -302,7 +306,7 @@ public class TileMapGenerator : MonoBehaviour {
                                     }
                                 }
                                 break;
-                            case 3: //right
+                            case 2: //right
                                 x = (int)firstPrefab.coords.x + firstPrefab.tileMapPrefab.tileMap.sizeX - 1;
                                 y = (int)firstPrefab.coords.y + opennings[fO][1];
                                 py = prospectiveOpennings[pO][1];

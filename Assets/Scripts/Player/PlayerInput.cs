@@ -2,11 +2,11 @@
 using System.Collections;
 
 public class PlayerInput : MonoBehaviour {
-    private PlayerController player;
+    private PlayerController1 player;
 	
     // Use this for initialization
 	void Awake () {
-        player = GetComponent<PlayerController>();
+        player = GetComponent<PlayerController1>();
 	}
 	
     void FixedUpdate()

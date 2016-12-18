@@ -3,10 +3,10 @@ using System.Collections;
 
 public class CielingCheck : MonoBehaviour {
 
-    private PlayerController player;
+    private PlayerController1 player;
 
 	void Start () {
-        player = gameObject.GetComponentInParent<PlayerController>();
+        player = gameObject.GetComponentInParent<PlayerController1>();
 	}
 	
 	void OnTriggerEnter2D(Collider2D collider)

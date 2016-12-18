@@ -28,8 +28,8 @@ public class WeightedItem<T>
 public class WeightedShuffler<T> {
 
     private List<WeightedItem<T>> items;
-    private double weightSum;
-    private double weightMin;
+    private int weightSum;
+    private int weightMin;
     private Random random;
 
 	//constructor
@@ -37,7 +37,7 @@ public class WeightedShuffler<T> {
     {
         items = new List<WeightedItem<T>>();
         weightSum = 0;
-        weightMin = double.MaxValue;
+        weightMin = int.MaxValue;
         random = new Random();
 
     }
@@ -46,12 +46,12 @@ public class WeightedShuffler<T> {
     {
         items = new List<WeightedItem<T>>();
         weightSum = 0;
-        weightMin = double.MaxValue;
+        weightMin = int.MaxValue;
         random = new Random(seed);
     }
 
     //adds an item to current list with its probabillity
-    public void Add(T o, double weight)
+    public void Add(T o, int weight)
     {
         items.Add(new WeightedItem<T>(o, weight, weightSum, weightSum + weight));
 
@@ -77,20 +77,20 @@ public class WeightedShuffler<T> {
         while (itemsP.Count > 0)
         {
             //get random number in range
-            double num = random.NextDouble() * weightSum;
+            int num = random.Next(weightSum) * weightSum;
             //search down items looking at range for appropiate hit
             int hit = -1;
             int i = 0;
             for (; i < itemsP.Count && itemsP[i].rangeMax < num; i++) ;
-            if (i < itemsP.Count && itemsP[i].rangeMin < num + double.Epsilon * i)
+            if (i < itemsP.Count && itemsP[i].rangeMin < num * i)
                 hit = i;
             //if range is missing, linear probe for new hit
-            for (double d = 0; d < weightSum && hit < 0; d += weightMin)
+            for (int probe = 0; probe < weightSum && hit < 0; probe += weightMin)
             {
-                num += (weightSum * .5) - weightMin;
+                num += (weightSum / 2) - weightMin;
                 num = num % weightSum;
                 for (i = 0; i < itemsP.Count && itemsP[i].rangeMax < num; i++) ;
-                if (i < itemsP.Count && itemsP[i].rangeMin < num + double.Epsilon * i)
+                if (i < itemsP.Count && itemsP[i].rangeMin < num * i)
                     hit = i;
             }
             //add hit to list and remve it from itemsP
