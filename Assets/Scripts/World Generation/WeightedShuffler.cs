@@ -62,7 +62,7 @@ public class WeightedShuffler<T> {
     }
     
     //return a shuffled list
-    public List<T> GetShufledList()
+    public List<T> GetShuffledList()
     {
         List<T> list = new List<T>();
 
@@ -77,17 +77,17 @@ public class WeightedShuffler<T> {
         while (itemsP.Count > 0)
         {
             //get random number in range
-            int num = random.Next(weightSum) * weightSum;
+            int num = random.Next(weightSum);
             //search down items looking at range for appropiate hit
             int hit = -1;
             int i = 0;
             for (; i < itemsP.Count && itemsP[i].rangeMax < num; i++) ;
-            if (i < itemsP.Count && itemsP[i].rangeMin < num * i)
+            if (i < itemsP.Count && itemsP[i].rangeMin < num)
                 hit = i;
             //if range is missing, linear probe for new hit
-            for (int probe = 0; probe < weightSum && hit < 0; probe += weightMin)
+            for (int iterator = 0; iterator < weightSum && hit < 0; iterator += weightMin)
             {
-                num += (weightSum / 2) - weightMin;
+                num += (weightSum / 2) + weightMin;
                 num = num % weightSum;
                 for (i = 0; i < itemsP.Count && itemsP[i].rangeMax < num; i++) ;
                 if (i < itemsP.Count && itemsP[i].rangeMin < num * i)

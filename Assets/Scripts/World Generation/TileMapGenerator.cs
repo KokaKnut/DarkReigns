@@ -68,6 +68,7 @@ public class TileMapGenerator : MonoBehaviour {
             }
         }
 
+        //Get all solution paths from scanner
         byte[,] solution = GetComponent<ImgScanner>().ScanImg(0);
 
         uniques = new List<TileMapPrefabDef>();
@@ -155,7 +156,7 @@ public class TileMapGenerator : MonoBehaviour {
             while(firstPrefab.linkages < firstPrefab.linkageNumber && fO < opennings.Count && !done)
             {
                 //call the shuffler for a new list
-                List<TileMapPrefabDef> shuffledList = shuffler.GetShufledList();
+                List<TileMapPrefabDef> shuffledList = shuffler.GetShuffledList();
 
                 int p = 0;
                 //run through list of prefabs
