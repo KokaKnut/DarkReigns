@@ -31,10 +31,11 @@ public class TileMapGenerator : MonoBehaviour {
 
     public void BuildTileMap()
     {
+        
         tileMap = new TileMap(sizeX, sizeY);
 
-        // temporary random tiles algorithm
-        while(!GenerateWorld())
+        // build initial world data
+        while (!GenerateWorld())
             tileMap = new TileMap(sizeX, sizeY);
         
         // Now build the mesh with the tile map we made
@@ -48,6 +49,7 @@ public class TileMapGenerator : MonoBehaviour {
         }
         else
             gameObject.GetComponent<TileCollision>().RemoveCollision();
+
     }
 
     public bool GenerateWorld()
@@ -68,37 +70,42 @@ public class TileMapGenerator : MonoBehaviour {
             }
         }
 
-        //Get all solution paths from scanner
-        byte[,] solution = GetComponent<ImgScanner>().ScanImg(0);
-
-        uniques = new List<TileMapPrefabDef>();
-        foreach(TileMapPrefabDef prefab in prefabs.prefabTypes)
-        {
-            if (prefab.unique)
-                uniques.Add(prefab);
-        }
-        
-        commons = new List<TileMapPrefabDef>();
+        //Get first solution path from scanner
+        ImgScanner.ColorKey[,] solution = GetComponent<ImgScanner>().ScanImg(0);
 
         WeightedShuffler<TileMapPrefabDef> shuffler = new WeightedShuffler<TileMapPrefabDef>(seed);
         if (!isSeed)
             shuffler = new WeightedShuffler<TileMapPrefabDef>();
 
+        TileMapPrefabDef start;
+        uniques = new List<TileMapPrefabDef>();
+        commons = new List<TileMapPrefabDef>();
+
         foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
         {
-            if (!(prefab.unique))
+            if (prefab.type == TileMapPrefabDef.prefabType.unique)
+                uniques.Add(prefab);
+
+            if (prefab.type == TileMapPrefabDef.prefabType.start)
+                start = prefab;
+
+            if (prefab.type == TileMapPrefabDef.prefabType.normal)
             {
                 commons.Add(prefab);
                 shuffler.Add(prefab, prefab.rarity);
             }
         }
-
+        
         List<TileMapPrefabDef> drawn = new List<TileMapPrefabDef>();
         List<TileMapPrefabDef> drawnFully = new List<TileMapPrefabDef>();
 
+        // draw the start
+
+
+        /* old code for populating uniques on world
         foreach (TileMapPrefabDef prefab in uniques)
         {
-            if (prefab.rarity >= random.Next())
+            if (prefab.rarity >= 1)
             {
                 for (int y = 0; y < prefab.tileMapPrefab.tileMap.sizeY; y++)
                 {
@@ -110,7 +117,7 @@ public class TileMapGenerator : MonoBehaviour {
 
                 drawn.Add(prefab);
             }
-        }
+        } */
 
         int panic = 0;
         bool done = false;
@@ -422,14 +429,14 @@ public class TileMapGenerator : MonoBehaviour {
         uniques = new List<TileMapPrefabDef>();
         foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
         {
-            if (prefab.unique)
+            if (!(prefab.type == TileMapPrefabDef.prefabType.normal))
                 uniques.Add(prefab);
         }
 
         commons = new List<TileMapPrefabDef>();
         foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
         {
-            if (!(prefab.unique))
+            if (prefab.type == TileMapPrefabDef.prefabType.normal)
                 commons.Add(prefab);
         }
 

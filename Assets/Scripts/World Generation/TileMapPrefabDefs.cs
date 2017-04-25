@@ -7,10 +7,18 @@ public struct TileMapPrefabDef
 
     public string Name;
     public TileMapPrefabBuilder tileMapPrefab;
-    public bool unique;
     public int rarity;
     public Vector2 coords;
     public int linkageNumber;
+
+    public prefabType type;
+    public enum prefabType
+    {
+        normal,
+        start,
+        end,
+        unique
+    }
 
     private int _linkages;
     public int linkages
