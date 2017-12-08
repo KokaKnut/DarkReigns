@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Controller2D))]
-public class PlayerController : MonoBehaviour
+public class PlayerController2 : MonoBehaviour
 {
     public float movespeed = 60;
     public float gravity = -200;
