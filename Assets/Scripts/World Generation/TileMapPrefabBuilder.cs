@@ -14,6 +14,7 @@ public class TileMapPrefabBuilder : MonoBehaviour
     void Awake()
     {
         Disable();
+        tileMap.ResetLinkages();
     }
 
     [ContextMenu("Hide Contents")]

@@ -22,8 +22,6 @@ public class TileMapGenerator : MonoBehaviour {
     public TileMapPrefabDefs prefabs;
 
     private TileMap tileMap;
-    private List<TileMapPrefabDef> commons;
-    private List<TileMapPrefabDef> uniques;
 
     void Awake () {
         BuildTileMap();
@@ -31,12 +29,13 @@ public class TileMapGenerator : MonoBehaviour {
 
     public void BuildTileMap()
     {
-        
-        tileMap = new TileMap(sizeX, sizeY);
 
         // build initial world data
-        while (!GenerateWorld())
-            tileMap = new TileMap(sizeX, sizeY);
+        if (!GenerateWorld())
+        {
+            Debug.LogError("Failed to create world");
+            return;
+        }
         
         // Now build the mesh with the tile map we made
         gameObject.GetComponent<TileGraphics>().BuildMesh(tileMap, tileSize);
@@ -54,10 +53,16 @@ public class TileMapGenerator : MonoBehaviour {
 
     public bool GenerateWorld()
     {
-        System.Random random = new System.Random(seed);
-        if (!isSeed)
-            random = new System.Random();
 
+        //Get first solution path from scanner -- TODO: choose a path from a list
+        ImgScanner.ColorKey[,] solution = GetComponent<ImgScanner>().ScanImg(0);
+
+        tileMap = new TileMap(solution.GetLength(0), solution.GetLength(1));
+
+        sizeX = tileMap.sizeX;
+        sizeY = tileMap.sizeY;
+
+        //build a border if we need one
         if (border)
         {
             for (int y = 0; y < sizeY; y++)
@@ -70,16 +75,27 @@ public class TileMapGenerator : MonoBehaviour {
             }
         }
 
-        //Get first solution path from scanner
-        ImgScanner.ColorKey[,] solution = GetComponent<ImgScanner>().ScanImg(0);
-
+        //start our RNG assuming we have a seed
+        System.Random random = new System.Random(seed);
         WeightedShuffler<TileMapPrefabDef> shuffler = new WeightedShuffler<TileMapPrefabDef>(seed);
+        //then change that if we don't
         if (!isSeed)
+        {
+            random = new System.Random();
             shuffler = new WeightedShuffler<TileMapPrefabDef>();
+        }
 
-        TileMapPrefabDef start;
-        uniques = new List<TileMapPrefabDef>();
-        commons = new List<TileMapPrefabDef>();
+        //initialize some some key prefabs
+        TileMapPrefabDef start = new TileMapPrefabDef()
+        {
+            Name = "NULL"
+        };
+        TileMapPrefabDef end = new TileMapPrefabDef()
+        {
+            Name = "NULL"
+        };
+        List<TileMapPrefabDef> uniques = new List<TileMapPrefabDef>();
+        List<TileMapPrefabDef> commons = new List<TileMapPrefabDef>();
 
         foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
         {
@@ -89,6 +105,9 @@ public class TileMapGenerator : MonoBehaviour {
             if (prefab.type == TileMapPrefabDef.prefabType.start)
                 start = prefab;
 
+            if (prefab.type == TileMapPrefabDef.prefabType.end)
+                end = prefab;
+
             if (prefab.type == TileMapPrefabDef.prefabType.normal)
             {
                 commons.Add(prefab);
@@ -96,11 +115,51 @@ public class TileMapGenerator : MonoBehaviour {
             }
         }
         
+        //initialize our lists that keep track of how what we have drawn
         List<TileMapPrefabDef> drawn = new List<TileMapPrefabDef>();
         List<TileMapPrefabDef> drawnFully = new List<TileMapPrefabDef>();
 
-        // draw the start
+        // find the start
+        Debug.Assert(start.Name != "NULL" && end.Name != "NULL"); //this shows that we actually have a start/end
+        int startX = 0, startY = 0;
 
+        for (int x = 0; x < sizeX; x++)
+        {
+            for (int y = 0; y < sizeY && startY == 0; y++)
+            {
+                if (solution[x, y] == ImgScanner.ColorKey.green)
+                {
+                    startX = x;
+                    startY = y;
+                }
+            }
+        }
+        
+        bool free = true;
+        for(int i = 0; free && i < start.tileMapPrefab.tileMap.sizeY; i++)
+        {
+            for(int j = 0; free && j < start.tileMapPrefab.tileMap.sizeX; j++)
+            {
+                if (tileMap.GetTile(startX - start.tileMapPrefab.tileMap.sizeX + j, startY - start.tileMapPrefab.tileMap.sizeY + start.tileMapPrefab.tileMap.right[0] + i) != null)
+                    free = false;
+            }
+        }
+
+        if (!free) // if we can't place the start, don't try to build the world
+        {
+            return false;
+        }
+
+        for (int i = 0; free && i < start.tileMapPrefab.tileMap.sizeY; i++)
+        {
+            for (int j = 0; free && j < start.tileMapPrefab.tileMap.sizeX; j++)
+            {
+                tileMap.SetTile(startX - start.tileMapPrefab.tileMap.sizeX + j, startY - start.tileMapPrefab.tileMap.sizeY + start.tileMapPrefab.tileMap.right[0] + i,
+                    new Tile(startX - start.tileMapPrefab.tileMap.sizeX + j, startY - start.tileMapPrefab.tileMap.sizeY + start.tileMapPrefab.tileMap.right[0] + i, start.tileMapPrefab.tileMap.GetTile(j, i).type));
+            }
+        }
+
+        drawn.Add(start);
 
         /* old code for populating uniques on world
         foreach (TileMapPrefabDef prefab in uniques)
@@ -219,7 +278,7 @@ public class TileMapGenerator : MonoBehaviour {
                                 px = prospectiveOpennings[pO][1];
                                 if ((x - px) > 0 && (x + (prospectivePrefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y + prospectivePrefab.tileMapPrefab.tileMap.sizeY) < (tileMap.sizeY - 1))
                                 {
-                                    bool free = true;
+                                    free = true;
                                     for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
                                     {
                                         for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
@@ -253,7 +312,7 @@ public class TileMapGenerator : MonoBehaviour {
                                 py = prospectivePrefab.tileMapPrefab.tileMap.sizeY;
                                 if ((x - px) > 0 && (x + (prospectivePrefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y - py) > 0)
                                 {
-                                    bool free = true;
+                                    free = true;
                                     for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
                                     {
                                         for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
@@ -287,7 +346,7 @@ public class TileMapGenerator : MonoBehaviour {
                                 py = prospectiveOpennings[pO][1];
                                 if ((y - py) > 0 && (y + (prospectivePrefab.tileMapPrefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x - px) > 0)
                                 {
-                                    bool free = true;
+                                    free = true;
                                     for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
                                     {
                                         for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
@@ -320,7 +379,7 @@ public class TileMapGenerator : MonoBehaviour {
                                 py = prospectiveOpennings[pO][1];
                                 if ((y - py) > 0 && (y + (prospectivePrefab.tileMapPrefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prospectivePrefab.tileMapPrefab.tileMap.sizeX) < (tileMap.sizeX - 1))
                                 {
-                                    bool free = true;
+                                    free = true;
                                     for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
                                     {
                                         for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
@@ -425,6 +484,9 @@ public class TileMapGenerator : MonoBehaviour {
                 }
             }
         }
+
+        List<TileMapPrefabDef> uniques = new List<TileMapPrefabDef>();
+        List<TileMapPrefabDef> commons = new List<TileMapPrefabDef>();
 
         uniques = new List<TileMapPrefabDef>();
         foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)

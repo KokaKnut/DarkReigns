@@ -21,6 +21,8 @@ public class Tile : IComparable {
     [SerializeField]
     private int _y;
 
+    private bool _linkageTile = false;
+
     public TYPE type
     {
         get
@@ -54,6 +56,18 @@ public class Tile : IComparable {
         get
         {
             return new int[] { x, y };
+        }
+    }
+
+    public bool linkageTile
+    {
+        get
+        {
+            return _linkageTile;
+        }
+        set
+        {
+            _linkageTile = value;
         }
     }
 

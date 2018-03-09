@@ -36,7 +36,7 @@ public class TileMap {
         }
     }
 
-    //prefabed tilemap data
+    //prefabed tilemap data and link hoookups
     public bool prefab = false;
     public int[] top;
     public int[] bot;
@@ -199,6 +199,9 @@ public class TileMap {
     /// <returns>Returns an array of the smaller tilmaps.</returns>
     public TileMap[] Split(int x, int y)
     {
+        if (x == 0 || y == 0)
+            return new TileMap[1] { this };
+
         int numberX, numberY;
         numberX = (sizeX / x) + Mathf.Clamp(sizeX % x, 0, 1);
         numberY = (sizeY / y) + Mathf.Clamp(sizeY % y, 0, 1);
@@ -231,6 +234,55 @@ public class TileMap {
         }
 
         return maps;
+    }
+
+    /// <summary>
+    /// Finds all of the linkages in a tilemap, based on the data from each tile
+    /// </summary>
+    /// <returns>Returns an array of the coordinates of each linkage tile.</returns>
+    public Vector2[] GetLinkages()
+    {
+        List<Vector2> linkageList = new List<Vector2>();
+        for(int i = 0; i < sizeX; i++)
+        {
+            for(int j = 0; j < sizeY; j++)
+            {
+                if (GetTile(i, j).linkageTile)
+                    linkageList.Add(new Vector2(i, j));
+            }
+        }
+
+        return linkageList.ToArray();
+    }
+
+    public void ResetLinkages()
+    {
+        //set all to having to linkage property
+        for (int i = 0; i < sizeX; i++)
+        {
+            for (int j = 0; j < sizeY; j++)
+            {
+                GetTile(i, j).linkageTile = false;
+            }
+        }
+
+        //set ones that should have linkage prperty
+        for (int i = 0; i < top.Length; i++)
+        {
+            GetTile(top[i], sizeY - 1).linkageTile = true;
+        }
+        for (int i = 0; i < bot.Length; i++)
+        {
+            GetTile(bot[i], 0).linkageTile = true;
+        }
+        for (int i = 0; i < left.Length; i++)
+        {
+            GetTile(0, left[i]).linkageTile = true;
+        }
+        for (int i = 0; i < right.Length; i++)
+        {
+            GetTile(sizeX - 1, right[i]).linkageTile = true;
+        }
     }
 
     [ContextMenu("Print Contents")]

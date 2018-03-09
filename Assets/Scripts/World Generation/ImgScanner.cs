@@ -8,12 +8,12 @@ public class ImgScanner : MonoBehaviour {
     // new colors go here and in "Start()"
     public enum ColorKey
     {
-        black,
-        white,
-        red,
-        blue,
-        green,
-        yellow
+        black,      // main path
+        white,      // empty space
+        red,        // end of path
+        blue,       // special
+        green,      // start of path
+        yellow      // side path
     }
 
     Dictionary<Color32, ColorKey> colorsDictionary;
@@ -35,7 +35,7 @@ public class ImgScanner : MonoBehaviour {
                 if (colorsDictionary.TryGetValue(allPixels[(y * data.GetLength(0)) + x], out test))
                     data[x, y] = test;
                 else
-                    Debug.LogError("No match found for a color in image at index " + i);
+                    Debug.LogError("No match found for a color in image at index " + i + " and coordinates: " + x + ", " + y);
             }
         }
 
@@ -48,12 +48,12 @@ public class ImgScanner : MonoBehaviour {
         {
             colorsDictionary = new Dictionary<Color32, ColorKey>();
 
-            colorsDictionary.Add(new Color32(0, 0, 0, 0), ColorKey.black);
-            colorsDictionary.Add(new Color32(255, 255, 255, 0), ColorKey.white);
-            colorsDictionary.Add(new Color32(255, 0, 0, 0), ColorKey.red);
-            colorsDictionary.Add(new Color32(0, 0, 255, 0), ColorKey.blue);
-            colorsDictionary.Add(new Color32(0, 255, 0, 0), ColorKey.green);
-            colorsDictionary.Add(new Color32(255, 255, 0, 0), ColorKey.yellow);
+            colorsDictionary.Add(new Color32(0, 0, 0, 255), ColorKey.black);
+            colorsDictionary.Add(new Color32(255, 255, 255, 255), ColorKey.white);
+            colorsDictionary.Add(new Color32(255, 0, 0, 255), ColorKey.red);
+            colorsDictionary.Add(new Color32(0, 0, 255, 255), ColorKey.blue);
+            colorsDictionary.Add(new Color32(0, 255, 0, 255), ColorKey.green);
+            colorsDictionary.Add(new Color32(255, 255, 0, 255), ColorKey.yellow);
         }
     }
 }
