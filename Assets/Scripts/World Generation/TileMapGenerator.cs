@@ -458,6 +458,420 @@ public class TileMapGenerator : MonoBehaviour {
         return true;
     }
 
+    TileMap MakeConnector(int x, int y)
+    {
+        TileMap connector = new TileMap(x,y);
+
+        return connector;
+    }
+
+    public bool GenerateWorldV1()
+    {
+
+        //Get first solution path from scanner -- TODO: choose a path from a list
+        ImgScanner.ColorKey[,] solution = GetComponent<ImgScanner>().ScanImg(0);
+
+        tileMap = new TileMap(solution.GetLength(0), solution.GetLength(1));
+
+        sizeX = tileMap.sizeX;
+        sizeY = tileMap.sizeY;
+
+        //build a border if we need one
+        if (border)
+        {
+            for (int y = 0; y < sizeY; y++)
+            {
+                for (int x = 0; x < sizeX; x++)
+                {
+                    if (y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1)
+                        tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
+                }
+            }
+        }
+
+        //start our RNG assuming we have a seed
+        System.Random random = new System.Random(seed);
+        WeightedShuffler<TileMapPrefabDef> shuffler = new WeightedShuffler<TileMapPrefabDef>(seed);
+        //then change that if we don't
+        if (!isSeed)
+        {
+            random = new System.Random();
+            shuffler = new WeightedShuffler<TileMapPrefabDef>();
+        }
+
+        //initialize some some key prefabs
+        TileMapPrefabDef start = new TileMapPrefabDef()
+        {
+            Name = "NULL"
+        };
+        TileMapPrefabDef end = new TileMapPrefabDef()
+        {
+            Name = "NULL"
+        };
+        List<TileMapPrefabDef> uniques = new List<TileMapPrefabDef>();
+        List<TileMapPrefabDef> commons = new List<TileMapPrefabDef>();
+
+        foreach (TileMapPrefabDef prefab in prefabs.prefabTypes)
+        {
+            if (prefab.type == TileMapPrefabDef.prefabType.unique)
+                uniques.Add(prefab);
+
+            if (prefab.type == TileMapPrefabDef.prefabType.start)
+                start = prefab;
+
+            if (prefab.type == TileMapPrefabDef.prefabType.end)
+                end = prefab;
+
+            if (prefab.type == TileMapPrefabDef.prefabType.normal)
+            {
+                commons.Add(prefab);
+                shuffler.Add(prefab, prefab.rarity);
+            }
+        }
+
+        //initialize our lists that keep track of how what we have drawn
+        List<TileMapPrefabDef> drawn = new List<TileMapPrefabDef>();
+        List<TileMapPrefabDef> drawnFully = new List<TileMapPrefabDef>();
+
+        // find the start
+        Debug.Assert(start.Name != "NULL" && end.Name != "NULL"); //this shows that we actually have a start/end
+        int startX = 0, startY = 0;
+
+        for (int x = 0; x < sizeX; x++)
+        {
+            for (int y = 0; y < sizeY && startY == 0; y++)
+            {
+                if (solution[x, y] == ImgScanner.ColorKey.green)
+                {
+                    startX = x;
+                    startY = y;
+                }
+            }
+        }
+
+        bool free = true;
+        for (int i = 0; free && i < start.tileMapPrefab.tileMap.sizeY; i++)
+        {
+            for (int j = 0; free && j < start.tileMapPrefab.tileMap.sizeX; j++)
+            {
+                if (tileMap.GetTile(startX - start.tileMapPrefab.tileMap.sizeX + j, startY - start.tileMapPrefab.tileMap.sizeY + start.tileMapPrefab.tileMap.right[0] + i) != null)
+                    free = false;
+            }
+        }
+
+        if (!free) // if we can't place the start, don't try to build the world
+        {
+            return false;
+        }
+
+        for (int i = 0; free && i < start.tileMapPrefab.tileMap.sizeY; i++)
+        {
+            for (int j = 0; free && j < start.tileMapPrefab.tileMap.sizeX; j++)
+            {
+                tileMap.SetTile(startX - start.tileMapPrefab.tileMap.sizeX + j, startY - start.tileMapPrefab.tileMap.sizeY + start.tileMapPrefab.tileMap.right[0] + i,
+                    new Tile(startX - start.tileMapPrefab.tileMap.sizeX + j, startY - start.tileMapPrefab.tileMap.sizeY + start.tileMapPrefab.tileMap.right[0] + i, start.tileMapPrefab.tileMap.GetTile(j, i).type));
+            }
+        }
+
+        drawn.Add(start);
+
+        /* old code for populating uniques on world
+        foreach (TileMapPrefabDef prefab in uniques)
+        {
+            if (prefab.rarity >= 1)
+            {
+                for (int y = 0; y < prefab.tileMapPrefab.tileMap.sizeY; y++)
+                {
+                    for (int x = 0; x < prefab.tileMapPrefab.tileMap.sizeX; x++)
+                    {
+                        tileMap.SetTile(x + (int)prefab.coords.x, y + (int)prefab.coords.y, new Tile(x + (int)prefab.coords.x, y + (int)prefab.coords.y, prefab.tileMapPrefab.tileMap.GetTile(x, y).type));
+                    }
+                }
+
+                drawn.Add(prefab);
+            }
+        } */
+
+        int panic = 0;
+        bool done = false;
+
+        if (drawn.Count == 0 || commons.Count == 0)
+            done = true;
+
+        while (drawn.Count > 0 && !done)
+        {
+            //choose first item on the list "drawn"
+            TileMapPrefabDef firstPrefab = drawn[0];
+
+            //make list of opennings
+            List<int[]> opennings = new List<int[]>();
+            foreach (int openning in firstPrefab.tileMapPrefab.tileMap.top)
+            {
+                opennings.Add(new int[] { 0, openning });
+            }
+            foreach (int openning in firstPrefab.tileMapPrefab.tileMap.bot)
+            {
+                opennings.Add(new int[] { 1, openning });
+            }
+            foreach (int openning in firstPrefab.tileMapPrefab.tileMap.left)
+            {
+                opennings.Add(new int[] { 2, openning });
+            }
+            foreach (int openning in firstPrefab.tileMapPrefab.tileMap.right)
+            {
+                opennings.Add(new int[] { 3, openning });
+            }
+
+            //shuffle list of opennings
+            for (int i = opennings.Count - 1, j; i >= 1; i--)
+            {
+                j = random.Next(i);
+                int[] tempint = opennings[j];
+                opennings[j] = opennings[i];
+                opennings[i] = tempint;
+            }
+
+            int fO = 0;
+            //run through list of opennings until linkages are filled
+            while (firstPrefab.linkages < firstPrefab.linkageNumber && fO < opennings.Count && !done)
+            {
+                //call the shuffler for a new list
+                List<TileMapPrefabDef> shuffledList = shuffler.GetShuffledList();
+
+                int p = 0;
+                //run through list of prefabs
+                while (p < shuffledList.Count && !done)
+                {
+                    //make list of prefab opennings on prefab
+                    TileMapPrefabDef prospectivePrefab = shuffledList[p];
+
+                    //make list of opennings
+                    List<int[]> prospectiveOpennings = new List<int[]>();
+                    if (opennings[fO][0] == 1)
+                        foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.top)
+                        {
+                            prospectiveOpennings.Add(new int[] { 0, openning });
+                        }
+                    if (opennings[fO][0] == 0)
+                        foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.bot)
+                        {
+                            prospectiveOpennings.Add(new int[] { 1, openning });
+                        }
+                    if (opennings[fO][0] == 3)
+                        foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.left)
+                        {
+                            prospectiveOpennings.Add(new int[] { 2, openning });
+                        }
+                    if (opennings[fO][0] == 2)
+                        foreach (int openning in prospectivePrefab.tileMapPrefab.tileMap.right)
+                        {
+                            prospectiveOpennings.Add(new int[] { 3, openning });
+                        }
+
+                    //shuffle list of opennings
+                    for (int i = prospectiveOpennings.Count - 1, j; i >= 1; i--)
+                    {
+                        j = random.Next(i);
+                        int[] tempint = prospectiveOpennings[j];
+                        prospectiveOpennings[j] = prospectiveOpennings[i];
+                        prospectiveOpennings[i] = tempint;
+                    }
+
+                    int x = 0, y = 0;
+                    int px = 0, py = 0;
+                    int pO = 0;
+                    //run through list of opennings on prefab
+                    while (pO < prospectiveOpennings.Count && !done)
+                    {
+                        //place prefab if it fits, and if it does, exit loop and exit the next one too (this leaves us continueing the list of opennings)
+                        switch (prospectiveOpennings[pO][0])
+                        {
+                            case 1: //top
+                                x = (int)firstPrefab.coords.x + opennings[fO][1];
+                                y = (int)firstPrefab.coords.y + firstPrefab.tileMapPrefab.tileMap.sizeY - 1;
+                                px = prospectiveOpennings[pO][1];
+                                if ((x - px) > 0 && (x + (prospectivePrefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y + prospectivePrefab.tileMapPrefab.tileMap.sizeY) < (tileMap.sizeY - 1))
+                                {
+                                    free = true;
+                                    for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                    {
+                                        for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                        {
+                                            if (tileMap.GetTile(x - px + j, y + 1 + i) != null)
+                                                free = false;
+                                        }
+                                    }
+                                    if (free)
+                                    {
+                                        for (int i = 0; i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                        {
+                                            for (int j = 0; j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                            {
+                                                tileMap.SetTile(x - px + j, y + 1 + i, new Tile(x - px + j, y + 1 + i, prospectivePrefab.tileMapPrefab.tileMap.GetTile(j, i).type));
+                                            }
+                                        }
+                                        prospectivePrefab.coords = new Vector2(x - px, y + 1);
+                                        firstPrefab.linkages++; // TODO: make this recalculate, not just increment
+                                        drawn.Remove(firstPrefab);
+                                        drawn.Insert(0, firstPrefab);
+                                        prospectivePrefab.linkages++;
+                                        drawn.Add(prospectivePrefab);
+                                    }
+                                }
+                                break;
+                            case 0: //bot
+                                x = (int)firstPrefab.coords.x + opennings[fO][1];
+                                y = (int)firstPrefab.coords.y;
+                                px = prospectiveOpennings[pO][1];
+                                py = prospectivePrefab.tileMapPrefab.tileMap.sizeY;
+                                if ((x - px) > 0 && (x + (prospectivePrefab.tileMapPrefab.tileMap.sizeX - px)) < (tileMap.sizeX - 1) && (y - py) > 0)
+                                {
+                                    free = true;
+                                    for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                    {
+                                        for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                        {
+                                            if (tileMap.GetTile(x - px + j, y - py + i) != null)
+                                                free = false;
+                                        }
+                                    }
+                                    if (free)
+                                    {
+                                        for (int i = 0; i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                        {
+                                            for (int j = 0; j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                            {
+                                                tileMap.SetTile(x - px + j, y - py + i, new Tile(x - px + j, y - py + i, prospectivePrefab.tileMapPrefab.tileMap.GetTile(j, i).type));
+                                            }
+                                        }
+                                        prospectivePrefab.coords = new Vector2(x - px, y - py);
+                                        firstPrefab.linkages++; // TODO: make this recalculate, not just increment
+                                        drawn.RemoveAt(0);
+                                        drawn.Insert(0, firstPrefab);
+                                        prospectivePrefab.linkages++;
+                                        drawn.Add(prospectivePrefab);
+                                    }
+                                }
+                                break;
+                            case 3: //left
+                                x = (int)firstPrefab.coords.x;
+                                y = (int)firstPrefab.coords.y + opennings[fO][1];
+                                px = prospectivePrefab.tileMapPrefab.tileMap.sizeX;
+                                py = prospectiveOpennings[pO][1];
+                                if ((y - py) > 0 && (y + (prospectivePrefab.tileMapPrefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x - px) > 0)
+                                {
+                                    free = true;
+                                    for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                    {
+                                        for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                        {
+                                            if (tileMap.GetTile(x - px + j, y - py + i) != null)
+                                                free = false;
+                                        }
+                                    }
+                                    if (free)
+                                    {
+                                        for (int i = 0; i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                        {
+                                            for (int j = 0; j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                            {
+                                                tileMap.SetTile(x - px + j, y - py + i, new Tile(x - px + j, y - py + i, prospectivePrefab.tileMapPrefab.tileMap.GetTile(j, i).type));
+                                            }
+                                        }
+                                        prospectivePrefab.coords = new Vector2(x - px, y - py);
+                                        firstPrefab.linkages++; // TODO: make this recalculate, not just increment
+                                        drawn.RemoveAt(0);
+                                        drawn.Insert(0, firstPrefab);
+                                        prospectivePrefab.linkages++;
+                                        drawn.Add(prospectivePrefab);
+                                    }
+                                }
+                                break;
+                            case 2: //right
+                                x = (int)firstPrefab.coords.x + firstPrefab.tileMapPrefab.tileMap.sizeX - 1;
+                                y = (int)firstPrefab.coords.y + opennings[fO][1];
+                                py = prospectiveOpennings[pO][1];
+                                if ((y - py) > 0 && (y + (prospectivePrefab.tileMapPrefab.tileMap.sizeY - py)) < (tileMap.sizeY - 1) && (x + prospectivePrefab.tileMapPrefab.tileMap.sizeX) < (tileMap.sizeX - 1))
+                                {
+                                    free = true;
+                                    for (int i = 0; free && i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                    {
+                                        for (int j = 0; free && j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                        {
+                                            if (tileMap.GetTile(x + 1 + j, y - py + i) != null)
+                                                free = false;
+                                        }
+                                    }
+                                    if (free)
+                                    {
+                                        for (int i = 0; i < prospectivePrefab.tileMapPrefab.tileMap.sizeY; i++)
+                                        {
+                                            for (int j = 0; j < prospectivePrefab.tileMapPrefab.tileMap.sizeX; j++)
+                                            {
+                                                tileMap.SetTile(x + 1 + j, y - py + i, new Tile(x + 1 + j, y - py + i, prospectivePrefab.tileMapPrefab.tileMap.GetTile(j, i).type));
+                                            }
+                                        }
+                                        prospectivePrefab.coords = new Vector2(x + 1, y - py);
+                                        firstPrefab.linkages++; // TODO: make this recalculate, not just increment
+                                        drawn.RemoveAt(0);
+                                        drawn.Insert(0, firstPrefab);
+                                        prospectivePrefab.linkages++;
+                                        drawn.Add(prospectivePrefab);
+                                    }
+                                }
+                                break;
+                        }
+
+                        pO++;
+
+                        if (panic++ >= 50000)
+                        {
+                            print("Prefab checking list caused overflow panic!");
+                            done = true;
+                        }
+                    }
+
+                    p++;
+
+                    if (panic++ >= 50000)
+                    {
+                        print("Shuffled list caused overflow panic!");
+                        done = true;
+                    }
+                }
+
+                fO++;
+
+                if (panic++ >= 50000)
+                {
+                    print("Linkage filling caused overflow panic!");
+                    done = true;
+                }
+            }
+
+            //remove first item from list "drawn" and add it to "drawnFully"
+            drawnFully.Add(drawn[0]);
+            drawn.RemoveAt(0);
+
+            if (panic++ >= 50000)
+            {
+                print("Prefab populating caused overflow panic!");
+                done = true;
+            }
+        }
+
+        for (int y = 0; y < sizeY; y++)
+        {
+            for (int x = 0; x < sizeX; x++)
+            {
+                if (tileMap.GetTile(x, y) == null)
+                    tileMap.SetTile(x, y, new Tile(x, y, Tile.TYPE.ground));
+            }
+        }
+
+        return true;
+    }
+
     private int[,] GenerateSolution()
     {
         int[,] solution = new int[sizeX, sizeY];
