@@ -5,30 +5,27 @@ Check Wiki for links!
 
 Dark Reigns Idea List
 
-Idea:Platformer Game that revolves around collecting weapons/items and using boss fights to create even better items
+Idea: Platformer Game that revolves around collecting weapons/items and using boss fights to create even better items
 
-Ideas
+# Concept Paper
 --------------------
--Weapon Degredatiion
 
--Procedural Generation (40 or so Spelunky themed tiles)
+-Procedural Generation of levels to allow extreme replayabillity
 
--Boss is summoned with certain components on the map, along with player items place into it
+-Boss is summoned with the boss shrine at the end of a level, along with the player's items place into it
 
--"Boss Crafting" depending on items placed into summoning chamber
+-"Boss Crafting": depending on items placed into summoning chamber, the boss will spawn with deifferent abillities and extra stats 
 
--Better items/more items of type placed in, higher chance of type of item/quality
+-Better items/more items of type placed, higher chance of type of item/quality (loot based gameplay loop)
 
--URGENCY: Done with weapons degrading over time and/or monsters outright stop dropping weapons
+-Instill sense of urgency: Done with weapons degrading over time?
 
 -Endless inventory?
 
--VISIBLE PLAYER, but still recognizable in a swarm.
+-VISIBLE PLAYER, but still recognizable in a swarm
 
--Use of Diskel/pixel art. 
+-Demonic/Satanic ritual themes
 
--Demonic/Satanic theme
+-"Glorify" an item for another playthrough
 
--"Glorify" an item for another playthrough.
-
--COOP!
+-Co-op for online play and couch co-op styles
