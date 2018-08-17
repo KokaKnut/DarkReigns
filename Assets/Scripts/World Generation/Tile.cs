@@ -20,7 +20,7 @@ public class Tile : IComparable {
     private int _x;
     [SerializeField]
     private int _y;
-
+    [SerializeField]
     private bool _linkageTile = false;
 
     public TYPE type

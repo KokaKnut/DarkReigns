@@ -5,37 +5,77 @@ using System.Collections;
 [CustomEditor(typeof(TileMapPrefabBuilder))]
 public class TileMapPrefabBuilderInspector : Editor {
 
-    Vector2 selectorCoord = new Vector2();
-    Vector2 selectorSnap = new Vector2();
-    Tile.TYPE selectorType = Tile.TYPE.none;
-
-    bool topExp;
-    bool botExp;
-    bool leftExp;
-    bool rightExp;
+    Vector3 mouseCoord = new Vector3();
 
     Vector2 size;
     Vector2 newSize;
     //serialized fields
-    //SerializedProperty tileMap;
     SerializedProperty tileSize;
     SerializedProperty tileDefs;
     SerializedProperty preview;
     SerializedProperty tg;
+    SerializedProperty painting;
+    SerializedProperty tileHighlight;
+    SerializedProperty tilePaint;
 
     void OnEnable()
     {
-        //tileMap = serializedObject.FindProperty("tileMap");
         tileSize = serializedObject.FindProperty("tileSize");
         tileDefs = serializedObject.FindProperty("tileDefs");
         preview = serializedObject.FindProperty("preview");
         tg = serializedObject.FindProperty("tg");
+        painting = serializedObject.FindProperty("painting");
+        tileHighlight = serializedObject.FindProperty("tileHighlight");
+        tilePaint = serializedObject.FindProperty("tilePaint");
         size = ((TileMapPrefabBuilder)target).tileMap.size;
         
         //((TileMapPrefabBuilder)target).gameObject.GetComponent<SpriteRenderer>().hideFlags = HideFlags.HideInInspector;
         tg.objectReferenceValue = ((TileMapPrefabBuilder)target).gameObject.GetComponent<TileGraphics>();
         //((TileGraphics)tg.objectReferenceValue).hideFlags = HideFlags.HideInInspector;
-        
+    }
+
+    void OnSceneGUI()
+    {
+        mouseCoord = new Vector3(Event.current.mousePosition.x, Event.current.mousePosition.y);
+        mouseCoord.y = SceneView.currentDrawingSceneView.camera.pixelHeight - mouseCoord.y; // fixes inverted mouse data
+        mouseCoord = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(mouseCoord); // convert the position from screen to world coordinates
+        mouseCoord.z = 0;
+
+        if (painting.boolValue)
+        {
+            Vector2 tileCoord = new Vector2((mouseCoord.x - ((TileMapPrefabBuilder)target).transform.position.x) / tileSize.floatValue, (mouseCoord.y - ((TileMapPrefabBuilder)target).transform.position.y) / tileSize.floatValue);
+
+            if (tileCoord.x > 0 && tileCoord.x < size.x && tileCoord.y > 0 && tileCoord.y < size.y)
+            {
+                tileHighlight.vector2Value = new Vector2((int)tileCoord.x, (int)tileCoord.y);
+
+                Event e = Event.current;
+                int controlID = GUIUtility.GetControlID(FocusType.Passive);
+                EventType eventType = e.GetTypeForControl(controlID);
+
+                if (e.isMouse && e.button == 0 && (e.type == EventType.MouseDrag || e.type == EventType.MouseDown || e.type == EventType.MouseUp))
+                {
+                    ((TileMapPrefabBuilder)target).PaintTile((int)tileCoord.x, (int)tileCoord.y, (Tile.TYPE)tilePaint.enumValueIndex);
+                    switch (eventType)
+                    {
+                        case EventType.MouseDown:
+                            GUIUtility.hotControl = controlID;
+                            break;
+                        case EventType.MouseUp:
+                            GUIUtility.hotControl = 0;
+                            break;
+                    }
+                    e.Use();
+                }
+            }
+            else
+            {
+                tileHighlight.vector2Value = new Vector2(-1,-1);
+            }
+        }
+
+        serializedObject.ApplyModifiedProperties();
+        serializedObject.Update();
     }
 
     public override void OnInspectorGUI()
@@ -90,70 +130,26 @@ public class TileMapPrefabBuilderInspector : Editor {
             GUILayout.EndHorizontal();
         }
 
-        selectorCoord = EditorGUILayout.Vector2Field("Coordinate to Edit", selectorCoord);
-        selectorSnap = EditorGUILayout.Vector2Field("Selector to Snap by", selectorSnap);
-        selectorType = (Tile.TYPE)EditorGUILayout.EnumPopup(selectorType);
-
-        GUI.color = new Color(1f, 1f, .4f, 1f);
-        if (GUILayout.Button("Change Selected Tile"))
+        if (!painting.boolValue)
         {
-            ((TileMapPrefabBuilder)target).tileMap.SetTile((int)selectorCoord.x, (int)selectorCoord.y, selectorType);
-            selectorCoord += selectorSnap;
-            ((TileGraphics)tg.objectReferenceValue).BuildSprite((((TileMapPrefabBuilder)target).tileMap), ((TileMapPrefabBuilder)target).tileSize);
-        }
-        GUI.color = Color.white;
-
-        GUILayout.Space(10);
-        //The following are used for the opeinings in the prefab. Openings being where prefabs can be entered and exited.
-        GUILayout.Label("Keep these hidden when not in use");
-
-        topExp = EditorGUILayout.Foldout(topExp, "Top Openings");
-        if (topExp)
-        {
-            ((TileMapPrefabBuilder)target).tileMap.topSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.topSize);
-            int[] top = ((TileMapPrefabBuilder)target).tileMap.top;
-            for(int i=0; i < top.Length; i++)
+            if (GUILayout.Button("Start Painting"))
             {
-                top[i] = EditorGUILayout.IntField(i + ":", top[i]);
+                //swap the value for painting
+                painting.boolValue = !painting.boolValue;
             }
-            ((TileMapPrefabBuilder)target).tileMap.top = top;
+        }
+        else
+        {
+            GUI.color = Color.cyan;
+            if (GUILayout.Button("Stop Painting"))
+            {
+                //swap the value for painting
+                painting.boolValue = !painting.boolValue;
+            }
+            GUI.color = Color.white;
         }
 
-        botExp = EditorGUILayout.Foldout(botExp, "Bot Openings");
-        if (botExp)
-        {
-            ((TileMapPrefabBuilder)target).tileMap.botSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.botSize);
-            int[] bot = ((TileMapPrefabBuilder)target).tileMap.bot;
-            for (int i = 0; i < bot.Length; i++)
-            {
-                bot[i] = EditorGUILayout.IntField(i + ":", bot[i]);
-            }
-            ((TileMapPrefabBuilder)target).tileMap.bot = bot;
-        }
-
-        leftExp = EditorGUILayout.Foldout(leftExp, "Left Openings");
-        if (leftExp)
-        {
-            ((TileMapPrefabBuilder)target).tileMap.leftSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.leftSize);
-            int[] left = ((TileMapPrefabBuilder)target).tileMap.left;
-            for (int i = 0; i < left.Length; i++)
-            {
-                left[i] = EditorGUILayout.IntField(i + ":", left[i]);
-            }
-            ((TileMapPrefabBuilder)target).tileMap.left = left;
-        }
-
-        rightExp = EditorGUILayout.Foldout(rightExp, "Right Openings");
-        if (rightExp)
-        {
-            ((TileMapPrefabBuilder)target).tileMap.rightSize = EditorGUILayout.IntField("Size", ((TileMapPrefabBuilder)target).tileMap.rightSize);
-            int[] right = ((TileMapPrefabBuilder)target).tileMap.right;
-            for (int i = 0; i < right.Length; i++)
-            {
-                right[i] = EditorGUILayout.IntField(i + ":", right[i]);
-            }
-            ((TileMapPrefabBuilder)target).tileMap.right = right;
-        }
+        tilePaint.enumValueIndex = (int)(Tile.TYPE)EditorGUILayout.EnumPopup((Tile.TYPE)tilePaint.enumValueIndex);
 
         serializedObject.ApplyModifiedProperties();
         serializedObject.Update();

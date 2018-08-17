@@ -367,4 +367,63 @@ public class TileGraphics : MonoBehaviour {
 
         return texture;
     }
+
+    public static Mesh MakeTileMesh(TileMap tileMap, float tileSize)
+    {
+        int sizeX = tileMap.sizeX;
+        int sizeY = tileMap.sizeY;
+
+        int numTiles = sizeX * sizeY;
+        int numTris = numTiles * 2;
+
+        int vsizeX = sizeX + 1;
+        int vsizeY = sizeY + 1;
+        int numVerts = vsizeX * vsizeY;
+
+        //Generate the mesh data
+        Vector3[] verticies = new Vector3[numVerts];
+        Vector3[] normals = new Vector3[numVerts];
+        Vector2[] uvs = new Vector2[numVerts];
+
+        int[] triangles = new int[numTris * 3];
+
+        int x, y;
+        //Caluculate all verts
+        for (y = 0; y < vsizeY; y++)
+        {
+            for (x = 0; x < vsizeX; x++)
+            {
+                verticies[y * vsizeX + x] = new Vector3(x * tileSize, y * tileSize, 0);
+                normals[y * vsizeX + x] = Vector3.back;
+                uvs[y * vsizeX + x] = new Vector2((float)x / sizeX, (float)y / sizeY);
+            }
+        }
+
+        //Calculate all tris
+        for (y = 0; y < sizeY; y++)
+        {
+            for (x = 0; x < sizeX; x++)
+            {
+                //Triangle section
+                int squareIndex = y * sizeX + x;
+                int triOffset = squareIndex * 6;
+                triangles[triOffset + 0] = y * vsizeX + x + 0;
+                triangles[triOffset + 1] = y * vsizeX + x + vsizeX + 0;
+                triangles[triOffset + 2] = y * vsizeX + x + vsizeX + 1;
+
+                triangles[triOffset + 3] = y * vsizeX + x + 0;
+                triangles[triOffset + 4] = y * vsizeX + x + vsizeX + 1;
+                triangles[triOffset + 5] = y * vsizeX + x + 1;
+            }
+        }
+
+        //Create new mesh with our data
+        Mesh mesh = new Mesh();
+        mesh.vertices = verticies;
+        mesh.triangles = triangles;
+        mesh.normals = normals;
+        mesh.uv = uvs;
+
+        return mesh;
+    }
 }
